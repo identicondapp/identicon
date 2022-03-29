@@ -217,9 +217,9 @@ pub struct VerificationContract {
 
 ### Called by *Requestor*
 
-`request_verification(requestor_id, is_type, subject_id, subject_info)` Registers the new request in the blockchain and assigns validators to verify it.
+- `request_verification(requestor_id, is_type, subject_id, subject_info)` Registers the new request in the blockchain and assigns validators to verify it.
 
-`pay_validators(requestor_id, subject_id)`  After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
+- `pay_validators(requestor_id, subject_id)`  After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
 
 ### Called by *Validators*
 
