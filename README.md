@@ -26,11 +26,11 @@ Is the process performed buy a set of human validators with the goal of verifyin
 
 #### How is the verification done ?
 
-1. Someone (aka the *Requestor*) requests verification of the identity/life/etc of some particular subject (aka the *Subject*).
+1. Someone (aka the *Requestor*) requests verification of the identity/life/etc of some particular person (aka the *Subject*).
 
 2. A group of persons  (aka the *Validators*) visit the subject in the given address, within a certain *Time Window*.
 
-3. They verify that the *Subject* is alive and is who he/she claims and report it.
+3. They verify that the subject is alive and is who he/she claims and report it.
 
 4. When all verifications are completed the final state is evaluated based on the verification results.
 
@@ -61,11 +61,11 @@ The subject is the human being which will be verified.
 
 #### What is a government identification ?
 
-Is the identity document (DNI, Passport, Driver License, etc) issued by some local/national government which provide a unique identification for a given person.
+Is the identity document (DNI, Passport, Driver License, etc) issued by some local/national government which provides a unique identification for a given person.
 
 #### Who can be a *validator* ?
 
-Anyone wit a NEAR account can act as a validator, but it must be registered in the Dapp.
+Anyone with a NEAR account can act as a validator, but it must be registered in the Dapp.
 
 #### How will they be compensated ?
 
@@ -224,26 +224,28 @@ pub struct VerificationContract {
 ### Called by *Validators*
 
 - `report_verification_result(validator_id, subject_id, result, cause)` Report the result of the verification. If the verification was not possible, or the validator will not do it then  the validator must include a descriptive cause.
+
 - `register_as_validator(validator_id)` The NEAR account owner registers itself as a validator.
 
 ### Private
 
 - `assign_validators(self, subject_id) -> Validators` When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request-
+
 - `evaluate_results(self, results) -> VerificationState`   Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
 
 ### Not implemented
 
-- `cancel_verification(subject_id, cause)` Not implemented
+- `cancel_verification(subject_id, cause)`
 
-- `get_verification_transactions(requestor_id, subject_id)` Not implemented
+- `get_verification_transactions(requestor_id, subject_id)` 
 
-- `get_all_verifications_history(requestor_id, filters)` Not implemented
+- `get_all_verifications_history(requestor_id, filters)` 
 
-- `mint_digital_passport(requestor_id, subject_id)`  Not implemented
+- `mint_digital_passport(requestor_id, subject_id)`  
 
-- `unregister_as_validator(validator_id, self)` Not implemented
+- `unregister_as_validator(validator_id, self)` 
 
-- `get_my_assigned_verifications(validator_id)` Not implemented
+- `get_my_assigned_verifications(validator_id)` 
 
-- `get_my_verifications_history(validator_id, filters)` Not implemented
+- `get_my_verifications_history(validator_id, filters)` 
 
