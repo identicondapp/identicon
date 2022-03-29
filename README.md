@@ -1,3 +1,5 @@
+# Identicon protocol
+
 ## Objectives
 
 Identicon is a verification protocol for the OpenWeb.
@@ -13,7 +15,7 @@ Use cases:
 
 ## Concepts
 
-#### What is a *verification* ?
+#### What is a *verification* ?
 
 #### How is the verification done ?
 
@@ -49,7 +51,7 @@ The requestor must pay for the verification, and it is allways a NEAR account.
 ~~~rust
 
 // The Subject government identification as a string formed 
-// using 'type'+'number'+'country', ex: 'dni12488353ar'
+// using 'type'+'number'+'country', ex: 'dni:12488353:ar'
 type SubjectId = String;  
 
 // A NEAR account ID, ex: 'juanmescher.near'
@@ -72,14 +74,14 @@ struct ContactInfo {
 
 // A naive implementation for the subject Address location
 struct Location {
-  directions: String, // ex: 'Calle Las Lomitas Nro. 23 e/ Pampa y Las Vias'
+  directions: String, // ex: 'Calle Las Lomitas Nro. 23 e/ Pampa y La Via'
   city: String,
   province: String,
-  country: String, // ex 'mx', 'ar', ...
+  country: String, // ex 'mx', 'ar', 've', 'bo', cl', 'uy', ...
   coordinates: GPSCoordinates
 }
 
-// The Time Window in whcih the verification must be performed
+// The Time Window in which the verification must be performed
 struct TimeWindow {
 	starts: ISODateTime,
   ends: ISODateTime
@@ -103,32 +105,37 @@ enum VerificationType {
 }
 
 enum VerificationState {
-  /// Waiting for the verification results  
-  Pending,
+  /// Started but waiting for the validator results  
+  Pending, // code: P
 
-  /// Verification was approved
-  Approved,
+  /// Verification result is approved
+  Approved, // code: AP
 
-  /// Verification was rejected
-  Rejected { why: String },
+  /// Verification result is Rejected
+  Rejected { why: String }, // code: RX
 
-  /// It is impossible to do the verification, due to some reason which exceeds 
+  /// It is not possible to do the verification, due to some reason which exceeds 
   /// the Validator possibilites, such as inaccesible area, weather, etc
-  Impossible { why: String },
+  NotPossible { why: String }, // code: NP
 
   /// Validator will not do the verification, for some personal reason,
   /// but it requires a cause and explanation. Too many of this refusals 
   /// may eliminate the Validator from the validators pool.
-  WillNotDo { why: String }
+  WillNotDo { why: String } // code: WND
   
   /// Verification was canceled by Requestor
-  Canceled { why: String }
+  Canceled { why: String } // code: CX
 }
 
 // The min and max required validators to verify a given request
 // it may vary randomly between MIN and MAX
 const MIN_VALIDATORS = 3;
 const MAX_VALIDATORS = 4;
+
+struct VerificationResult {
+	validator_id: ValidatorId,
+  state: VerificationState
+}
 
 struct VerificationRequest {
   // the verification service required, which may include additional info
@@ -151,8 +158,8 @@ struct VerificationRequest {
   // whole verification is Rejected.
   state: VerificationState, 
   
-  // the array(MIN_VALIDATORS..MAX_VALIDATORS) of individual validator verifications  
-  results: Vec<VerificationState> 
+  // the array [MIN_VALIDATORS..MAX_VALIDATORS] of individual validator verifications  
+  results: Vec<VerificationResult> 
 }
 
 pub struct VerificationContract {
@@ -164,7 +171,7 @@ pub struct VerificationContract {
 	assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
   
   // the Pool of validators, as an array of ValidatorIds
-  validators: Vec<AccountId>,
+  validators: Vec<ValidatorId>,
 }
 
 ~~~
@@ -173,33 +180,30 @@ pub struct VerificationContract {
 
 ### Called by *Requestor*
 
-- `request_verification(is_type, subject_id, contact, where, when)` IMPLEMENT
+- `request_verification(is_type, subject_id, contact, where, when)` Registers the new request in the blockchain and assigns validators to verify it.
 
-- `cancel_verification(subject_id, cause)`
+- `cancel_verification(subject_id, cause)` Not implemented
 
-- `get_verification_transactions(subject_id)`
+- `get_verification_transactions(subject_id)` Not implemented
 
-- `get_requested_verifications_history(filters)`
+- `get_requested_verifications_history(filters)` Not implemented
 
-- `mint_digital_passport(subject_id)`  ESTARIA BUENO, no se si llegamos !
+- `mint_digital_passport(subject_id)`  Not implemented
 
 ### Called by *Validators*
 
-- `get_assigned_verifications(self)` IMPLEMENT
+- `get_assigned_verifications(self)` Not implemented
 
 - `report_verification_result(self, subject_id, result, cause)` IMPLEMENT
 
 - `register_as_validator(self)` IMPLEMENT
 
-- `unregister_as_validator(self)`
-- `get_my_verifications_history(self, filters)`
-
-### Called by *Contract*
-
-- `notify_verification_status(requestor, subject)`
+- `unregister_as_validator(self)` Not implemented
+- `get_my_verifications_history(self, filters)` Not implemented
 
 ### Private
 
 - `assign_validators(subject_id)` IMPLEMENT
-- `evaluate_request_state(verifications)`  IMPLEMENT
-- `pay_validators(validators)`  ESTARIA BUENO, no se si llegamos !
+- `evaluate_request_state(results) -> VerificationState`   IMPLEMENT
+- `pay_validators(validators)`  WILL TRY, NOT SURE WE WILL IMPLEMENT !
+
