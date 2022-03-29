@@ -29,8 +29,11 @@ Is the process performed buy a set of human validators with the goal of verifyin
 1. Someone (aka the *Requestor*) requests verification of the identity/life/etc of some particular subject (aka the *Subject*).
 
 2. A group of persons  (aka the *Validators*) visit the subject in the given address, within a certain *Time Window*.
+
 3. They verify that the *Subject* is alive and is who he/she claims and report it.
+
 4. When all verifications are completed the final state is evaluated based on the verification results.
+
 5. After the verification is completed the validators rewards are payed.
 
 #### What types of verifications are allowed ?
@@ -88,13 +91,13 @@ type ISODateTime = String;
 
 // The location coordinates as obtained from GoogleMaps/other
 struct GPSCoordinates {
-	long: u64,
-	lat: u64
+  long: u64,
+  lat: u64
 }
 
 // A naive implementation for the Subject Contact info
 struct ContactInfo {
-	phones: String,
+  phones: String,
   email: String,
 }
 
@@ -109,7 +112,7 @@ struct Location {
 
 // The Time Window in which the verification must be performed
 struct TimeWindow {
-	starts: ISODateTime,
+  starts: ISODateTime,
   ends: ISODateTime
 }
 
@@ -126,7 +129,7 @@ enum VerificationType {
   /// Validates that the Subject is alive, and lives in the indicated Location.
   /// It also implies a ProofOfIdentity. This is a recurrent validation, 
   // meaning it must be repeated every month.
-	ProofOfLife,
+  ProofOfLife,
   
   /// Validates that the Subject is who he says he is, and that is (obviously) alive.
   ProofOfIdentity,
@@ -167,7 +170,7 @@ const MIN_VALIDATORS = 3;
 const MAX_VALIDATORS = 4;
 
 struct VerificationResult {
-	validator_id: ValidatorId,
+  validator_id: ValidatorId,
   result: VerificationState,
   timestamp: ISODateTime,
 }
@@ -202,7 +205,7 @@ pub struct VerificationContract {
   
   // the assigned validations, as a Map keyed by ValidatorId
   // the value is a (variable) list of the SubjectIds to verify
-	assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
+  assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
   
   // the Pool of validators, as an array of ValidatorIds
   validators: Vec<ValidatorId>,
