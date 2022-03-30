@@ -195,6 +195,29 @@ impl VerificationContract {
         subject_info: SubjectInfo,
     ) {
         log!("{:?} {:?} {:?}", requestor_id, is_type, subject_info)
+        let request = VerificationRequest {
+            is_type: is_type,
+            requestor_id: requestor_id,
+            subject_id: subject_id,
+            subject_info: subject_info,
+            state: VerificationState::Pending,
+            results: Vec::new()
+        };
+
+        // randomly assign the validators
+        let selected_validators = self.assign_validators(subject_id);
+        for validator in selected_validators.iter() {
+            request.results.push(VerificationResult {
+                validator_id: validator,
+                result: VerificationState::Pending,
+                timestamp: "".to_string(),
+            });
+        }
+
+        // add to the verifications to do
+        self.verifications.insert(subject_id, &request);
+        // 
+
     }
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
@@ -233,6 +256,7 @@ impl VerificationContract {
     }
 
     /* Not implemented */
+
     /* TODO: to be implemented */
 
     //cancel_verification(subject_id, cause)
@@ -303,17 +327,17 @@ mod tests {
             state: VerificationState::Pending,
             results: vec![
                 VerificationResult {
-                    validator_id: "validator1.testnet".to_string(),
+                    validator_id: "validator01.testnet".to_string(),
                     result: VerificationState::Pending,
                     timestamp: "".to_string(),
                 },
                 VerificationResult {
-                    validator_id: "validator2.testnet".to_string(),
+                    validator_id: "validator02.testnet".to_string(),
                     result: VerificationState::Pending,
                     timestamp: "".to_string(),
                 },
                 VerificationResult {
-                    validator_id: "validator3.testnet".to_string(),
+                    validator_id: "validator03.testnet".to_string(),
                     result: VerificationState::Pending,
                     timestamp: "".to_string(),
                 },
@@ -331,7 +355,14 @@ mod tests {
             &"validator01.testnet".to_string(),
             &vec!["subject01.testnet".to_string()],
         );
-        contract.validators = vec!["maz1.testnet".to_string(), "maz2.testnet".to_string()];
+        contract.validators = vec![
+            "validator01.testnet".to_string(), 
+            "validator02.testnet".to_string(),
+            "validator03.testnet".to_string(),
+            "validator04.testnet".to_string(),
+            "validator05.testnet".to_string(),
+            "validator06.testnet".to_string(),
+        ];
         contract
     }
 
@@ -344,8 +375,6 @@ mod tests {
         log!("Contract::new() -> {:?}", &contract);
 
         let mut contract1 = moq_contract_data(contract);
-
-        let request = moq_request_data();
 
         contract1.pay_validators("maz.testnet".to_string(), "maz.testnet".to_string());
     }
