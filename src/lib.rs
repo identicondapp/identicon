@@ -1,64 +1,249 @@
-use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
+use near_sdk::collections::{UnorderedMap};
+use near_sdk::{
+    borsh::{self, BorshDeserialize, BorshSerialize},
+    log,
+    serde::{Deserialize, Serialize},
+    AccountId, PanicOnDefault, Promise,
+};
 use near_sdk::{env, near_bindgen};
 
-#[near_bindgen]
-#[derive(Default, BorshDeserialize, BorshSerialize)]
-pub struct Contract {
-    crossword_solution: String,
+// The Subject government identification as a string formed 
+// using 'type'+'number'+'country', ex: 'dni:12488353:ar'
+type SubjectId = String;  
+
+// A NEAR account ID, ex: 'validator1.identicon.near'
+type ValidatorId = String; 
+
+// A DateTime in ISO format 'AAAA-MM-DD hh:mm:ss', ex: '2022-03-27 00:00:00'
+type ISODateTime = String; 
+
+// The location coordinates as obtained from GoogleMaps/other
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct GPSCoordinates {
+  long: u64,
+  lat: u64
+}
+
+// A naive implementation for the Subject Contact info
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct ContactInfo {
+  phones: String,
+  email: String,
+}
+
+// A naive implementation for the subject Address location
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct Location {
+  directions: String, // ex: 'Calle Las Lomitas Nro. 23 e/ Pampa y La Via'
+  city: String,
+  province: String,
+  country: String, // ex 'mx', 'ar', 've', 'bo', cl', 'uy', ...
+  coordinates: GPSCoordinates
+}
+
+// The Time Window in which the verification must be performed
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct TimeWindow {
+  starts: ISODateTime,
+  ends: ISODateTime
+}
+
+// All the relevant Subject information
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct SubjectInfo {
+  age: u8,
+  sex: String,
+  contact: ContactInfo,
+  address: Location,
+}
+
+// The different verification services 
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+enum VerificationType {
+  /// Validates that the Subject is alive, and lives in the indicated Location.
+  /// It also implies a ProofOfIdentity. This is a recurrent validation, 
+  // meaning it must be repeated every month.
+  ProofOfLife,
+  
+  /// Validates that the Subject is who he says he is, and that is (obviously) alive.
+  ProofOfIdentity,
+
+  // Not implemented, reserved for future use
+  ProofOfExistence { asset: String },
+  ProofOfState { asset: String },
+  ProofOfOwnership { asset: String },
+  ProofOfService { service: String },
+}
+
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+enum VerificationState {
+  /// Started but waiting for the validator results  
+  Pending, // code: P
+
+  /// Verification result is approved
+  Approved, // code: AP
+
+  /// Verification result is Rejected
+  Rejected { why: String }, // code: RX
+
+  /// It is not possible to do the verification, due to some reason which exceeds 
+  /// the Validator possibilites, such as inaccesible area, weather, etc
+  NotPossible { why: String }, // code: NP
+
+  /// Validator will not do the verification, for some personal reason,
+  /// but it requires a cause and explanation. Too many of this refusals 
+  /// may eliminate the Validator from the validators pool.
+  WillNotDo { why: String }, // code: WND
+  
+  /// Verification was canceled by Requestor
+  Canceled { why: String }, // code: CX
+}
+
+// The min and max required validators to verify a given request
+// it may vary randomly between MIN and MAX
+const MIN_VALIDATORS:u8 = 3;
+const MAX_VALIDATORS:u8 = 4;
+
+// 1 Ⓝ in yoctoNEAR
+// to be paid to validator when task is completed
+const PRIZE_AMOUNT: u128 = 1_000_000_000_000_000_000_000_000;
+
+
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct VerificationResult {
+  validator_id: ValidatorId,
+  result: VerificationState,
+  timestamp: ISODateTime,
+}
+
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
+struct VerificationRequest {
+  // the verification service required, which may include additional info
+  // for some types such as ProofOfOwnership(asset) or ProofOfService(service).
+  is_type: VerificationType,
+  
+  // this is the account who requested the verification and will pay for it,
+  // and is NOT the same as the subject to be verified.
+  requestor_id: AccountId,
+  
+  // this is the subject to be verified, which is ALLWAYS a real human being,
+  // cats, dogs and other pets may be considered in the future :-)
+  subject_id: SubjectId,
+  subject_info: SubjectInfo,
+  when: TimeWindow,
+  
+  // the verification state of the whole request, as a result of the individual
+  // verifications. If any of the individual verifications is Rejected, then the
+  // whole verification is Rejected.
+  state: VerificationState, 
+  
+  // the array [MIN_VALIDATORS..MAX_VALIDATORS] of individual validator verifications  
+  results: Vec<VerificationResult> 
 }
 
 #[near_bindgen]
-impl Contract {
+#[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
+pub struct VerificationContract {
+  // the pending verifications as a iterable Map keyed by SubjectId
+  verifications: UnorderedMap<SubjectId, VerificationRequest>,
+  
+  // the assigned validations, as a Map keyed by ValidatorId
+  // the value is a (variable) list of the SubjectIds to verify
+  assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
+  
+  // the Pool of validators, as an array of ValidatorIds
+  validators: Vec<ValidatorId>,
+}
+
+#[near_bindgen]
+impl VerificationContract {
     #[init]
-    pub fn new(solution: String) -> Self {
+    pub fn new(owner_id: AccountId) -> Self {
         Self {
-            crossword_solution: solution,
+            owner_id,
+            verifications: UnorderedMap::new(b"c"),
+            assignments: UnorderedMap::new(b"u"),
+            validators: Vec::new(),
         }
     }
 
-    pub fn get_solution(&self) -> String {
-        self.crossword_solution.clone()
+    /* Called by *Requestor* */
+    
+    // Registers the new request in the blockchain and assigns validators to verify it.
+    pub fn request_verification(requestor_id: AccountId, is_type: VerificationType, subject_id: SubjectId, subject_info: SubjectInfo) {
+
     }
 
-    pub fn guess_solution(&mut self, solution: String) -> bool {
-        let hashed_input = env::sha256(solution.as_bytes());
-        let hashed_input_hex = hex::encode(&hashed_input);
+    // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
+    pub fn pay_validators(requestor_id: AccountId, subject_id: SubjectId) {
 
-        if hashed_input_hex == self.crossword_solution {
-            env::log_str("You guessed right!");
-            true
-        } else {
-            env::log_str("Try again.");
-            false
-        }
     }
+
+
+    /* Called by *Validators* */
+
+    // Report the result of the verification. If the verification was not possible, or the validator will not do it then  the validator must include a descriptive cause.
+    pub fn report_verification_result(validator_id: ValidatorId, subject_id: SubjectId, result: VerificationResult, cause: VerificationState) {
+
+    }
+
+    // The NEAR account owner registers itself as a validator.
+    pub fn register_as_validator(validator_id: ValidatorId) {
+
+    }
+
+    /* Private */
+
+    // When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request
+    fn assign_validators(&self, subject_id: SubjectId) -> Validators {
+
+    }
+
+    // Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
+    fn evaluate_results(&self, results: Vec<VerificationResult>) -> VerificationState {
+
+    }
+
+    /* Not implemented */ 
+    /* TODO: to be implemented */
+
+    //cancel_verification(subject_id, cause)
+
+    //get_verification_transactions(requestor_id, subject_id) 
+
+    //get_all_verifications_history(requestor_id, filters) 
+
+    //mint_digital_passport(requestor_id, subject_id)  
+
+    //unregister_as_validator(validator_id, self) 
+
+    //get_my_assigned_verifications(validator_id)
+
+    //get_my_verifications_history(validator_id, filters)
 }
 
 /*
  * the rest of this file sets up unit tests
  * to run these, the command will be:
- * cargo test --package rust-template -- --nocapture
- * Note: 'rust-template' comes from Cargo.toml's 'name' key
+ * cargo test --package identicon -- --nocapture
+ * Note: 'identicon' comes from Cargo.toml's 'name' key
  */
 
 // use the attribute below for unit tests
 #[cfg(test)]
 mod tests {
     use super::*;
-    use near_sdk::test_utils::{get_logs, VMContextBuilder};
+    use near_sdk::test_utils::VMContextBuilder;
     use near_sdk::{testing_env, AccountId};
-
-    #[test]
-    fn debug_get_hash() {
-        // Basic set up for a unit test
-        testing_env!(VMContextBuilder::new().build());
-
-        // Using a unit test to rapidly debug and iterate
-        let debug_solution = "near nomicon ref finance";
-        let debug_hash_bytes = env::sha256(debug_solution.as_bytes());
-        let debug_hash_string = hex::encode(debug_hash_bytes);
-        println!("Let's debug: {:?}", debug_hash_string);
-    }
 
     // part of writing unit tests is setting up a mock context
     // provide a `predecessor` here, it'll modify the default context
@@ -66,29 +251,5 @@ mod tests {
         let mut builder = VMContextBuilder::new();
         builder.predecessor_account_id(predecessor);
         builder
-    }
-
-    #[test]
-    fn check_guess_solution() {
-        // Get Alice as an account ID
-        let alice = AccountId::new_unchecked("alice.testnet".to_string());
-        // Set up the testing context and unit test environment
-        let context = get_context(alice);
-        testing_env!(context.build());
-
-        // Set up contract object and call the new method
-        let mut contract = Contract::new(
-            "69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f".to_string(),
-        );
-        let mut guess_result = contract.guess_solution("wrong answer here".to_string());
-        assert!(!guess_result, "Expected a failure from the wrong guess");
-        assert_eq!(get_logs(), ["Try again."], "Expected a failure log.");
-        guess_result = contract.guess_solution("near nomicon ref finance".to_string());
-        assert!(guess_result, "Expected the correct answer to return true.");
-        assert_eq!(
-            get_logs(),
-            ["Try again.", "You guessed right!"],
-            "Expected a successful log after the previous failed log."
-        );
     }
 }
