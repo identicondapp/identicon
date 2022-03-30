@@ -90,7 +90,7 @@ pub enum VerificationType {
     },
 }
 
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, PartialEq)]
 #[serde(crate = "near_sdk::serde")]
 pub enum VerificationState {
     /// Started but waiting for the validator results  
@@ -100,7 +100,7 @@ pub enum VerificationState {
     Approved, // code: AP
 
     /// Verification result is Rejected
-    Rejected { why: String }, // code: RX
+    Rejected, // code: RX
 
     /// It is not possible to do the verification, due to some reason which exceeds
     /// the Validator possibilites, such as inaccesible area, weather, etc
@@ -199,7 +199,26 @@ impl VerificationContract {
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
     pub fn pay_validators(&mut self, requestor_id: RequestorId, subject_id: SubjectId) {
-        log!("{:?} {:?}", requestor_id, subject_id)
+        log!("pay_validators: Executing pay_validators({:?} {:?})", requestor_id, subject_id);
+
+        // check if subject_id exists in verifications
+        assert!(
+            self.verifications.keys_as_vector().iter().any(|e| e == subject_id),
+            "pay_validators: Verification not found for subject_id"
+        );
+        
+        let verification = self.verifications.get(&subject_id).unwrap();
+        log!("pay_validators: Verification found for subject_id {:?} with state: {:?}", subject_id, verification.state);
+
+        let payable_states = vec![VerificationState::Approved, VerificationState::Rejected];
+        for result in verification.results.iter() {           
+            if payable_states.iter().any(|e| e == &result.result) {
+                log!("pay_validators: Payable validator found {:?}", result.validator_id);
+
+                // Now we need to pay 
+            }
+        }
+        
     }
 
     /* Called by *Validators* */
@@ -277,7 +296,7 @@ mod tests {
         let request = VerificationRequest {
             is_type: VerificationType::ProofOfLife,
             requestor_id: "identicon.testnet".to_string(),
-            subject_id: "".to_string(),
+            subject_id: "subject01".to_string(),
             subject_info: SubjectInfo {
                 age: 65,
                 sex: "M".to_string(),
@@ -303,17 +322,17 @@ mod tests {
             state: VerificationState::Pending,
             results: vec![
                 VerificationResult {
-                    validator_id: "validator1.testnet".to_string(),
-                    result: VerificationState::Pending,
+                    validator_id: "validator01.testnet".to_string(),
+                    result: VerificationState::Approved,
                     timestamp: "".to_string(),
                 },
                 VerificationResult {
-                    validator_id: "validator2.testnet".to_string(),
-                    result: VerificationState::Pending,
+                    validator_id: "validator02.testnet".to_string(),
+                    result: VerificationState::Rejected,
                     timestamp: "".to_string(),
                 },
                 VerificationResult {
-                    validator_id: "validator3.testnet".to_string(),
+                    validator_id: "validator03.testnet".to_string(),
                     result: VerificationState::Pending,
                     timestamp: "".to_string(),
                 },
@@ -331,7 +350,11 @@ mod tests {
             &"validator01.testnet".to_string(),
             &vec!["subject01.testnet".to_string()],
         );
-        contract.validators = vec!["maz1.testnet".to_string(), "maz2.testnet".to_string()];
+        contract.validators = vec![
+            "validator01.testnet".to_string(),
+            "validator02.testnet".to_string(),
+            "validator03.testnet".to_string(),
+        ];
         contract
     }
 
@@ -341,12 +364,12 @@ mod tests {
         testing_env!(VMContextBuilder::new().build());
 
         let contract = VerificationContract::new();
-        log!("Contract::new() -> {:?}", &contract);
+        
 
         let mut contract1 = moq_contract_data(contract);
 
-        // let request = moq_request_data();
+        contract1.pay_validators("requestor01.testnet".to_string(), "subject01.testnet".to_string());
 
-        contract1.pay_validators("maz.testnet".to_string(), "maz.testnet".to_string());
+        log!("Contract::new() -> {:?}", &contract1);
     }
 }
