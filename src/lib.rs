@@ -55,7 +55,7 @@ struct TimeWindow {
 // All the relevant Subject information
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
-struct SubjectInfo {
+pub struct SubjectInfo {
   age: u8,
   sex: String,
   contact: ContactInfo,
@@ -65,7 +65,7 @@ struct SubjectInfo {
 // The different verification services 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
-enum VerificationType {
+pub enum VerificationType {
   /// Validates that the Subject is alive, and lives in the indicated Location.
   /// It also implies a ProofOfIdentity. This is a recurrent validation, 
   // meaning it must be repeated every month.
@@ -83,7 +83,7 @@ enum VerificationType {
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
-enum VerificationState {
+pub enum VerificationState {
   /// Started but waiting for the validator results  
   Pending, // code: P
 
@@ -167,9 +167,8 @@ pub struct VerificationContract {
 #[near_bindgen]
 impl VerificationContract {
     #[init]
-    pub fn new(owner_id: AccountId) -> Self {
+    pub fn new() -> Self {
         Self {
-            owner_id,
             verifications: UnorderedMap::new(b"c"),
             assignments: UnorderedMap::new(b"u"),
             validators: Vec::new(),
@@ -191,8 +190,9 @@ impl VerificationContract {
 
     /* Called by *Validators* */
 
-    // Report the result of the verification. If the verification was not possible, or the validator will not do it then  the validator must include a descriptive cause.
-    pub fn report_verification_result(validator_id: ValidatorId, subject_id: SubjectId, result: VerificationResult, cause: VerificationState) {
+    // Report the result of the verification. If the verification was not possible, 
+    // or the validator will not do it then  the validator must include a descriptive cause.
+    pub fn report_verification_result(validator_id: ValidatorId, subject_id: SubjectId, result: VerificationState, cause: String) {
 
     }
 
@@ -204,13 +204,13 @@ impl VerificationContract {
     /* Private */
 
     // When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request
-    fn assign_validators(&self, subject_id: SubjectId) -> Validators {
-
+    fn assign_validators(&self, subject_id: SubjectId) -> Vec<ValidatorId> {
+      Vec::new()
     }
 
     // Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
     fn evaluate_results(&self, results: Vec<VerificationResult>) -> VerificationState {
-
+      VerificationState::Pending
     }
 
     /* Not implemented */ 
