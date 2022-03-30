@@ -345,7 +345,7 @@ mod tests {
 
         let mut contract1 = moq_contract_data(contract);
 
-        let request = moq_request_data();
+        // let request = moq_request_data();
 
         contract1.pay_validators("maz.testnet".to_string(), "maz.testnet".to_string());
     }
