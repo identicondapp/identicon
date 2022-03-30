@@ -58,8 +58,8 @@ struct TimeWindow {
 pub struct SubjectInfo {
   age: u8,
   sex: String,
-  contact: ContactInfo,
-  address: Location,
+  //contact: ContactInfo,
+  //address: Location,
 }
 
 // The different verification services 
@@ -166,6 +166,7 @@ pub struct VerificationContract {
 
 #[near_bindgen]
 impl VerificationContract {
+
     #[init]
     pub fn new() -> Self {
         Self {
@@ -178,8 +179,13 @@ impl VerificationContract {
     /* Called by *Requestor* */
     
     // Registers the new request in the blockchain and assigns validators to verify it.
-    pub fn request_verification(requestor_id: AccountId, is_type: VerificationType, subject_id: SubjectId, subject_info: SubjectInfo) {
-
+    //pub fn request_verification(requestor_id: AccountId, is_type: VerificationType, subject_id: SubjectId, subject_info: SubjectInfo) {
+    pub fn request_verification(&mut self, 
+      requestor_id: AccountId, 
+      is_type: VerificationType, 
+      subject_info: SubjectInfo
+    ) {
+      log!("{:?} {:?} {:?}", requestor_id, is_type, subject_info)
     }
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
@@ -197,8 +203,8 @@ impl VerificationContract {
     }
 
     // The NEAR account owner registers itself as a validator.
-    pub fn register_as_validator(validator_id: ValidatorId) {
-
+    pub fn register_as_validator(&mut self, validator_id: ValidatorId) {
+      log!("{:?}", validator_id);
     }
 
     /* Private */
