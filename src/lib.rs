@@ -164,6 +164,7 @@ pub struct VerificationContract {
   validators: Vec<ValidatorId>,
 }
 
+
 #[near_bindgen]
 impl VerificationContract {
 
@@ -179,18 +180,21 @@ impl VerificationContract {
     /* Called by *Requestor* */
     
     // Registers the new request in the blockchain and assigns validators to verify it.
-    //pub fn request_verification(requestor_id: AccountId, is_type: VerificationType, subject_id: SubjectId, subject_info: SubjectInfo) {
     pub fn request_verification(&mut self, 
       requestor_id: AccountId, 
       is_type: VerificationType, 
+      subject_id: SubjectId,
       subject_info: SubjectInfo
     ) {
       log!("{:?} {:?} {:?}", requestor_id, is_type, subject_info)
     }
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
-    pub fn pay_validators(requestor_id: AccountId, subject_id: SubjectId) {
-
+    pub fn pay_validators(&mut self, 
+      requestor_id: AccountId, 
+      subject_id: SubjectId
+    ) {
+      log!("{:?} {:?}", requestor_id, subject_id)
     }
 
 
