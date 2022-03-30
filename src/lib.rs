@@ -11,6 +11,8 @@ use near_sdk::{env, near_bindgen};
 // using 'type'+'number'+'country', ex: 'dni:12488353:ar'
 type SubjectId = String;  
 
+type RequestorId = String;  
+
 // A NEAR account ID, ex: 'validator1.identicon.near'
 type ValidatorId = String; 
 
@@ -133,7 +135,7 @@ struct VerificationRequest {
   
   // this is the account who requested the verification and will pay for it,
   // and is NOT the same as the subject to be verified.
-  requestor_id: AccountId,
+  requestor_id: RequestorId,
   
   // this is the subject to be verified, which is ALLWAYS a real human being,
   // cats, dogs and other pets may be considered in the future :-)
@@ -151,7 +153,7 @@ struct VerificationRequest {
 }
 
 #[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
+#[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
 pub struct VerificationContract {
   // the pending verifications as a iterable Map keyed by SubjectId
   verifications: UnorderedMap<SubjectId, VerificationRequest>,
@@ -181,7 +183,7 @@ impl VerificationContract {
     
     // Registers the new request in the blockchain and assigns validators to verify it.
     pub fn request_verification(&mut self, 
-      requestor_id: AccountId, 
+      requestor_id: RequestorId, 
       is_type: VerificationType, 
       subject_id: SubjectId,
       subject_info: SubjectInfo
@@ -191,7 +193,7 @@ impl VerificationContract {
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
     pub fn pay_validators(&mut self, 
-      requestor_id: AccountId, 
+      requestor_id: RequestorId, 
       subject_id: SubjectId
     ) {
       log!("{:?} {:?}", requestor_id, subject_id)
@@ -257,9 +259,24 @@ mod tests {
 
     // part of writing unit tests is setting up a mock context
     // provide a `predecessor` here, it'll modify the default context
+    #[allow(dead_code)]
     fn get_context(predecessor: AccountId) -> VMContextBuilder {
         let mut builder = VMContextBuilder::new();
         builder.predecessor_account_id(predecessor);
         builder
+    }
+
+    #[test]
+    fn test_pay_validators() {
+        // Basic set up for a unit test
+        testing_env!(VMContextBuilder::new().build());
+
+        let mut contract = VerificationContract::new();
+        log!("Contract::new() -> {:?}", &contract);
+
+        contract.validators = vec!["maz.testnet".to_string(), "maz2.testnet".to_string()];
+        log!("contract.validators -> {:?}", &contract.validators);
+
+        contract.pay_validators("maz.testnet".to_string(), "maz.testnet".to_string());
     }
 }
