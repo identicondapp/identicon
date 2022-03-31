@@ -210,7 +210,7 @@ impl VerificationContract {
         };
 
         // randomly assign the validators
-        let selected_validators = self.assign_validators(subject_id.to_string());
+        let selected_validators: Vec<ValidatorId> = self.assign_validators(subject_id.to_string());
         for validator in selected_validators.iter() {
             // add to the request results Vec
             request.results.push(VerificationResult {
@@ -306,17 +306,15 @@ impl VerificationContract {
 		self.validators.push(validator_id)
     }
 	
-	pub fn get_validators(&self) -> usize{
-		
+	pub fn get_validators_count(&self) -> usize{
 		self.validators.len()
-		
+	
 		/*
 		for i in &self.validators {
 			println!("{}",  i);
 			//println!("{}",  self.validators.get(i))
 		}
 		*/
- 
 	}
 	
 
@@ -532,9 +530,7 @@ mod tests {
     fn test_pay_validators() {
         // Basic set up for a unit test
         testing_env!(VMContextBuilder::new().build());
-
         let contract = VerificationContract::new();
-
         let mut contract1 = moq_contract_data(contract);
 
         contract1.pay_validators(
@@ -547,19 +543,19 @@ mod tests {
 	fn test_register_validators() {
 		// Basic set up for a unit test
 		testing_env!(VMContextBuilder::new().build());
-		let contract = VerificationContract::new();
-		
-		let mut contract1 = moq_contract_data(contract);
-	
-		contract1.register_as_validator("rdelaros1.testnet".to_string());
-		contract1.register_as_validator("rdelaros2.testnet".to_string());
-		contract1.register_as_validator("rdelaros3.testnet".to_string());
-		contract1.register_as_validator("rdelaros4.testnet".to_string());
-		contract1.register_as_validator("rdelaros5.testnet".to_string());
-		
-		assert_eq!(5, contract1.get_validators);
-		
-		
+		let mut contract = VerificationContract::new();
+
+		contract.register_as_validator("rdelaros1.testnet".to_string());
+		contract.register_as_validator("rdelaros2.testnet".to_string());
+		contract.register_as_validator("rdelaros3.testnet".to_string());
+		contract.register_as_validator("rdelaros4.testnet".to_string());
+		contract.register_as_validator("rdelaros5.testnet".to_string());
+
+        log!("\n---\ntest_register_validator {:?} {:?}", 
+            contract.get_validators_count(), 
+            contract.validators
+        );
+		assert_eq!(5, contract.get_validators_count());
 	}
 	
 }
