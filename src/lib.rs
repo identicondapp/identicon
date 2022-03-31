@@ -192,9 +192,21 @@ impl VerificationContract {
         requestor_id: RequestorId,
         is_type: VerificationType,
         subject_id: SubjectId,
-        subject_info: SubjectInfo,
+        subject_info: SubjectInfo
     ) {
-        log!("\nRequestor={:?} {:?} Subject={:?}", requestor_id, is_type, subject_id);
+        log!(
+            "\nrequest_verification: Called method request_verification({:?} {:?} {:?})", 
+            requestor_id, is_type, subject_id
+        );
+
+        // check if subject_id already exists in verifications
+        assert!(
+            !self.verifications
+                .keys_as_vector()
+                .iter()
+                .any(|e| e == subject_id),
+            "request_verification: Verification already exists for subject_id"
+        );
 
         let mut request = VerificationRequest {
             is_type: is_type,
@@ -211,6 +223,11 @@ impl VerificationContract {
 
         // randomly assign the validators
         let selected_validators: Vec<ValidatorId> = self.assign_validators(subject_id.to_string());
+        log!(
+            "request_verification: Assign selected validators {:?}", 
+            selected_validators
+        );
+
         for validator in selected_validators.iter() {
             // add to the request results Vec
             request.results.push(VerificationResult {
@@ -224,6 +241,10 @@ impl VerificationContract {
 
         // add this request to the verifications to do
         self.verifications.insert(&subject_id.to_string(), &request);
+        log!(
+            "request_verification: Added to verifications list {:?}", 
+            &request
+        );
     }
 
     /// Adds this subject to the validator assignments
@@ -232,14 +253,14 @@ impl VerificationContract {
         let mut assigned = if existent.is_some() { existent.unwrap() } else { Vec::new() };
         assigned.push(subject_id.to_string());
         self.assignments.insert(&validator_id.to_string(), &assigned);
-        log!("assigned to={:?} subject={:?} {:?}", validator_id, subject_id, assigned);
+        log!("request_verification: Assigned subject {:?} to validator {:?}", subject_id, validator_id);
     }
 
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
     pub fn pay_validators(&mut self, requestor_id: RequestorId, subject_id: SubjectId) {
         log!(
-            "pay_validators: Called method pay_validators({:?} {:?})",
+            "\npay_validators: Called method pay_validators({:?} {:?})",
             requestor_id,
             subject_id
         );
@@ -380,28 +401,8 @@ mod tests {
             is_type: VerificationType::ProofOfLife,
             requestor_id: "identicon.testnet".to_string(),
             subject_id: "subject01".to_string(),
-            subject_info: SubjectInfo {
-                age: 65,
-                sex: "M".to_string(),
-                contact: ContactInfo {
-                    phones: "+54-11-6549-4xxx".to_string(),
-                    email: "mazito.v2@gmail.com".to_string(),
-                },
-                address: LocationInfo {
-                    directions: "Calle Las Lomitas Nro. 23 e/ Pampa y La Via".to_string(),
-                    city: "Adrogue".to_string(),
-                    province: "Buenos Aires".to_string(),
-                    country: "ar".to_string(),
-                    coordinates: GPSCoordinates {
-                        lat: "".to_string(),
-                        long: "".to_string(),
-                    },
-                },
-            },
-            when: TimeWindow {
-                starts: "2022-03-28 00:00:00".to_string(),
-                ends: "2022-03-31 15:00:00".to_string(),
-            },
+            subject_info: moq_subject_info(),
+            when: moq_time_window(),
             state: VerificationState::Pending,
             results: vec![
                 VerificationResult {
