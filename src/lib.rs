@@ -194,36 +194,53 @@ impl VerificationContract {
         subject_id: SubjectId,
         subject_info: SubjectInfo,
     ) {
-        log!("{:?} {:?} {:?}", requestor_id, is_type, subject_info)
-        let request = VerificationRequest {
+        log!("\nRequestor={:?} {:?} Subject={:?}", requestor_id, is_type, subject_id);
+
+        let mut request = VerificationRequest {
             is_type: is_type,
-            requestor_id: requestor_id,
-            subject_id: subject_id,
+            requestor_id: requestor_id.to_string(),
+            subject_id: subject_id.to_string(),
             subject_info: subject_info,
+            when: TimeWindow {
+                starts: "2022-03-28 00:00:00".to_string(),
+                ends: "2022-03-31 15:00:00".to_string(),
+            },
             state: VerificationState::Pending,
             results: Vec::new()
         };
 
         // randomly assign the validators
-        let selected_validators = self.assign_validators(subject_id);
+        let selected_validators = self.assign_validators(subject_id.to_string());
         for validator in selected_validators.iter() {
+            // add to the request results Vec
             request.results.push(VerificationResult {
-                validator_id: validator,
+                validator_id: validator.to_string(),
                 result: VerificationState::Pending,
                 timestamp: "".to_string(),
             });
+
+            self.add_to_assignments(validator.to_string(), subject_id.to_string());
         }
 
-        // add to the verifications to do
-        self.verifications.insert(subject_id, &request);
-        // 
-
+        // add this request to the verifications to do
+        self.verifications.insert(&subject_id.to_string(), &request);
     }
+
+    /// Adds this subject to the validator assignments
+    fn add_to_assignments(&mut self, validator_id: ValidatorId, subject_id: SubjectId) {
+        let existent = self.assignments.get(&validator_id.to_string());
+        let mut assigned = if existent.is_some() { existent.unwrap() } else { Vec::new() };
+        assigned.push(subject_id.to_string());
+        self.assignments.insert(&validator_id.to_string(), &assigned);
+        log!("assigned to={:?} subject={:?} {:?}", validator_id, subject_id, assigned);
+    }
+
 
     // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
     pub fn pay_validators(&mut self, requestor_id: RequestorId, subject_id: SubjectId) {
         log!("{:?} {:?}", requestor_id, subject_id)
     }
+
 
     /* Called by *Validators* */
 
@@ -236,6 +253,7 @@ impl VerificationContract {
         result: VerificationState,
         cause: String,
     ) {
+
     }
 
     // The NEAR account owner registers itself as a validator.
@@ -247,12 +265,14 @@ impl VerificationContract {
 
     // When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request
     fn assign_validators(&self, subject_id: SubjectId) -> Vec<ValidatorId> {
-        Vec::new()
+        //Vec::new()
+        vec!["validator01".to_string(), "validator05".to_string()]
     }
 
     // Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
-    fn evaluate_results(&self, results: Vec<VerificationResult>) -> VerificationState {
+    fn evaluate_results(&mut self, results: Vec<VerificationResult>) -> VerificationState {
         VerificationState::Pending
+
     }
 
     /* Not implemented */
@@ -297,6 +317,7 @@ mod tests {
         builder
     }
 
+    #[allow(dead_code)]
     fn moq_request_data() -> VerificationRequest {
         let request = VerificationRequest {
             is_type: VerificationType::ProofOfLife,
@@ -346,15 +367,76 @@ mod tests {
         request
     }
 
+    #[allow(dead_code)]
+    fn moq_subject_info() -> SubjectInfo {
+        let subject_info = SubjectInfo {
+            age: 65,
+            sex: "M".to_string(),
+            contact: ContactInfo {
+                phones: "+54-11-6549-4xxx".to_string(),
+                email: "mazito.v2@gmail.com".to_string(),
+            },
+            address: LocationInfo {
+                directions: "Calle Las Lomitas Nro. 23 e/ Pampa y La Via".to_string(),
+                city: "Adrogue".to_string(),
+                province: "Buenos Aires".to_string(),
+                country: "ar".to_string(),
+                coordinates: GPSCoordinates {
+                    lat: "".to_string(),
+                    long: "".to_string(),
+                },
+            },
+        };
+        subject_info
+    }
+
+    #[allow(dead_code)]
+    fn moq_time_window() -> TimeWindow {
+        let when = TimeWindow {
+            starts: "2022-03-28 00:00:00".to_string(),
+            ends: "2022-03-31 15:00:00".to_string(),
+        };
+        when
+    }
+
+    #[allow(dead_code)]
+    fn moq_request_data_with_params(
+        requestor_id: RequestorId, 
+        subject_id: SubjectId, 
+        validators: Vec<ValidatorId>
+    ) -> VerificationRequest {
+        let mut request = VerificationRequest {
+            is_type: VerificationType::ProofOfLife,
+            requestor_id: requestor_id.to_string(),
+            subject_id: subject_id.to_string(),
+            subject_info: moq_subject_info(),
+            when: moq_time_window(),
+            state: VerificationState::Pending,
+            results: Vec::new()
+        };
+
+        for validator in validators.iter() {
+            request.results.push(VerificationResult {
+                validator_id: validator.to_string(),
+                result: VerificationState::Pending,
+                timestamp: "".to_string(),
+            });
+        }
+
+        request
+    }
+
     fn moq_contract_data(mut contract: VerificationContract) -> VerificationContract {
         let request = moq_request_data();
         contract
             .verifications
             .insert(&"subject01.testnet".to_string(), &request);
+
         contract.assignments.insert(
             &"validator01.testnet".to_string(),
             &vec!["subject01.testnet".to_string()],
         );
+
         contract.validators = vec![
             "validator01.testnet".to_string(), 
             "validator02.testnet".to_string(),
@@ -364,6 +446,27 @@ mod tests {
             "validator06.testnet".to_string(),
         ];
         contract
+    }
+
+    #[test]
+    fn test_request_verification() {
+        // Basic set up for a unit test
+        testing_env!(VMContextBuilder::new().build());
+        let subject_id = "mariozito.testnet".to_string();
+        let requestor_id = "juanmescher.testnet".to_string();
+        let mut contract = VerificationContract::new();
+
+        contract.request_verification(requestor_id.to_string(), 
+            VerificationType::ProofOfLife, 
+            subject_id.to_string(), 
+            moq_subject_info());
+
+        let request = contract.verifications.get(&subject_id).unwrap();
+        assert_eq!(request.requestor_id, requestor_id);
+        assert_eq!(request.subject_id, subject_id);
+        assert_eq!(request.results.len(), 2);
+        assert_eq!(contract.verifications.len(), 1);
+        assert_eq!(contract.assignments.len(), 2);
     }
 
     #[test]
