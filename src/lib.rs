@@ -265,7 +265,7 @@ impl VerificationContract {
 		self.validators.push(validator_id)
     }
 	
-	pub fn get_validators(&self) -> usize{
+	pub fn get_validators(&self) -> usize {
 		
 		self.validators.len()
 		
@@ -429,9 +429,7 @@ mod tests {
 		contract1.register_as_validator("rdelaros4.testnet".to_string());
 		contract1.register_as_validator("rdelaros5.testnet".to_string());
 		
-		assert_eq!(5, contract1.get_validators);
-		
-		
+		assert_eq!(8, contract1.get_validators());
 	}
 	
 }
