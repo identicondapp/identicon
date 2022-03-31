@@ -303,7 +303,22 @@ impl VerificationContract {
     // The NEAR account owner registers itself as a validator.
     pub fn register_as_validator(&mut self, validator_id: ValidatorId) {
         log!("{:?}", validator_id);
+		self.validators.push(validator_id)
     }
+	
+	pub fn get_validators(&self) -> usize{
+		
+		self.validators.len()
+		
+		/*
+		for i in &self.validators {
+			println!("{}",  i);
+			//println!("{}",  self.validators.get(i))
+		}
+		*/
+ 
+	}
+	
 
     /* Private */
 
@@ -527,4 +542,24 @@ mod tests {
             "subject01.testnet".to_string(),
         );
     }
+	
+	#[test]
+	fn test_register_validators() {
+		// Basic set up for a unit test
+		testing_env!(VMContextBuilder::new().build());
+		let contract = VerificationContract::new();
+		
+		let mut contract1 = moq_contract_data(contract);
+	
+		contract1.register_as_validator("rdelaros1.testnet".to_string());
+		contract1.register_as_validator("rdelaros2.testnet".to_string());
+		contract1.register_as_validator("rdelaros3.testnet".to_string());
+		contract1.register_as_validator("rdelaros4.testnet".to_string());
+		contract1.register_as_validator("rdelaros5.testnet".to_string());
+		
+		assert_eq!(5, contract1.get_validators);
+		
+		
+	}
+	
 }
