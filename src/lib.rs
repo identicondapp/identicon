@@ -90,7 +90,7 @@ pub enum VerificationType {
     },
 }
 
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, PartialEq)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, PartialEq, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub enum VerificationState {
     /// Started but waiting for the validator results  
@@ -124,7 +124,7 @@ const MAX_VALIDATORS: u8 = 4;
 // to be paid to validator when task is completed
 const PRIZE_AMOUNT: u128 = 1_000_000_000_000_000_000_000_000;
 
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 struct VerificationResult {
     validator_id: ValidatorId,
@@ -268,7 +268,10 @@ impl VerificationContract {
         );
     }
 
-    // After reception of all the validators results, we must pay each of the validators the corresponding compensation (0.5 NEAR). Validators which did not complete the verification will not receive payment.
+
+    // After reception of all the validators results, we must pay each of the validators 
+    // the corresponding compensation (1 NEAR). Validators which did not complete 
+    // the verification (for whatever reason) will not receive payment.
     pub fn pay_validators(&mut self, requestor_id: RequestorId, subject_id: SubjectId) {
         log!(
             "\npay_validators: Called method pay_validators({:?} {:?})",
@@ -320,18 +323,54 @@ impl VerificationContract {
     /* Called by *Validators* */
 
     // Report the result of the verification. If the verification was not possible,
-    // or the validator will not do it then  the validator must include a descriptive cause.
+    // or the validator will not do it then  the validator must include a 
+    // descriptive cause.
     pub fn report_verification_result(
         &mut self,
         validator_id: ValidatorId,
         subject_id: SubjectId,
-        result: VerificationState,
+        stated: VerificationState,
         cause: String,
     ) {
+        log!(
+            "\nreport_verification_result: Called method ({:?} {:?} {:?})",
+            validator_id,
+            subject_id,
+            stated
+        );
 
+        // check if subject_id exists in verifications
+        assert!(
+            self.verifications
+                .keys_as_vector()
+                .iter()
+                .any(|e| e == subject_id),
+            "report_verification_result: Request not found for subject_id"
+        );
+
+        let mut requested = self.verifications.get(&subject_id).unwrap();
+        
+        let mut changed: Vec<VerificationResult> = Vec::new();
+        for before in requested.results.iter() { 
+            if before.validator_id == validator_id { 
+                changed.push(VerificationResult {
+                    validator_id: validator_id.to_string(),
+                    result: stated.clone(),
+                    timestamp: "2022-03-31 16:00:00".to_string(),
+                });
+            } 
+            else {
+                changed.push(before.clone());
+            }
+        };
+
+        // and update the full request state
+        requested.results = changed.clone();
+        self.verifications.insert(&subject_id, &requested);
     }
 
-    // The NEAR account owner registers itself as a validator.
+
+    /// Some NEAR account owner registers itself as a validator.
     pub fn register_as_validator(&mut self, validator_id: ValidatorId) {
         log!("{:?}", validator_id);
         self.validators.push(validator_id)
@@ -347,11 +386,32 @@ impl VerificationContract {
     // When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request
     fn assign_validators(&self, subject_id: SubjectId) -> Vec<ValidatorId> {
         //Vec::new()
-        vec!["validator01".to_string(), "validator05".to_string()]
+        let val1: ValidatorId = self.validators[1].to_string();
+        let val2: ValidatorId = self.validators[2].to_string();
+        let val3: ValidatorId = self.validators[3].to_string();
+        vec![val1, val2, val3]
     }
+
 
     // Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
     fn evaluate_results(&mut self, results: Vec<VerificationResult>) -> VerificationState {
+        // first check if we have some pending result
+        if results.iter().any(|e| e.result == VerificationState::Pending) {
+            return VerificationState::Pending;
+        }
+
+        // now check if we have some of it rejected
+        match results.iter().find(|e| e.result == VerificationState::Rejected) {
+            Some(_) => { return VerificationState::Rejected },
+            None => { }
+        }
+
+        // check if we have the min required approvals
+        let approvals: u8 = results.iter().fold(0, |count, _| count + 1);
+        if approvals >= MIN_VALIDATORS {
+            return VerificationState::Approved
+        }
+
         VerificationState::Pending
     }
 
@@ -486,6 +546,7 @@ mod tests {
         request
     }
 
+    #[allow(dead_code)]
     fn moq_contract_data(mut contract: VerificationContract) -> VerificationContract {
         let request = moq_request_data();
         contract
@@ -505,6 +566,23 @@ mod tests {
             "validator05.testnet".to_string(),
             "validator06.testnet".to_string(),
         ];
+
+        contract
+    }
+
+    #[allow(dead_code)]
+    fn moq_validators_pool(mut contract: VerificationContract) -> VerificationContract {
+        contract.register_as_validator("rdelaros1.testnet".to_string());
+        contract.register_as_validator("rdelaros2.testnet".to_string());
+        contract.register_as_validator("rdelaros3.testnet".to_string());
+        contract.register_as_validator("rdelaros4.testnet".to_string());
+        contract.register_as_validator("rdelaros5.testnet".to_string());
+        contract.register_as_validator("rdelaros6.testnet".to_string());
+        contract.register_as_validator("rdelaros7.testnet".to_string());
+        contract.register_as_validator("rdelaros8.testnet".to_string());
+        contract.register_as_validator("rdelaros9.testnet".to_string());
+        contract.register_as_validator("rdelaros10.testnet".to_string());
+        contract.register_as_validator("rdelaros11.testnet".to_string());
         contract
     }
 
@@ -512,8 +590,8 @@ mod tests {
     fn test_request_verification() {
         // Basic set up for a unit test
         testing_env!(VMContextBuilder::new().build());
-        let subject_id = "mariozito.testnet".to_string();
-        let requestor_id = "juanmescher.testnet".to_string();
+        let subject_id = "ar_dni_12488353".to_string();
+        let requestor_id = "mariozito.testnet".to_string();
         let mut contract = VerificationContract::new();
 
         contract.request_verification(
@@ -570,7 +648,12 @@ mod tests {
         testing_env!(VMContextBuilder::new().build());
         let subject_id = "ar_dni_12488353".to_string();
         let requestor_id = "juanmescher.testnet".to_string();
+        let valid0 = "rdelaros2.testnet".to_string();
+        let valid1 = "rdelaros3.testnet".to_string();
+        let valid2 = "rdelaros4.testnet".to_string();
         let mut contract = VerificationContract::new();
+
+        contract = moq_validators_pool(contract);
 
         contract.request_verification(
             requestor_id.to_string(),
@@ -579,12 +662,34 @@ mod tests {
             moq_subject_info(),
         );
 
+        // the second validator approved it
+        contract.report_verification_result(
+            valid1.to_string(), 
+            subject_id.to_string(),
+            VerificationState::Approved,
+            "".to_string());
         let request = contract.verifications.get(&subject_id).unwrap();
-        assert_eq!(request.requestor_id, requestor_id);
-        assert_eq!(request.subject_id, subject_id);
-        assert_eq!(request.results.len(), 2);
-        assert_eq!(contract.verifications.len(), 1);
-        assert_eq!(contract.assignments.len(), 2);
+        assert_eq!(request.results[1].result, VerificationState::Approved);
+
+        // the third validator approved it
+        contract.report_verification_result(
+            valid2.to_string(), 
+            subject_id.to_string(),
+            VerificationState::Approved,
+            "".to_string());
+        let request = contract.verifications.get(&subject_id).unwrap();
+        assert_eq!(request.results[2].result, VerificationState::Approved);
+
+        // the first validator approved it
+        contract.report_verification_result(
+            valid0.to_string(), 
+            subject_id.to_string(),
+            VerificationState::Approved,
+            "".to_string());
+        let request = contract.verifications.get(&subject_id).unwrap();
+        assert_eq!(request.results[0].result, VerificationState::Approved);
+
+        log!("\ntest_report_verification_result: {:?}", request.results);
     }
 
 }
