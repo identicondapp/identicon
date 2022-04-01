@@ -4,7 +4,7 @@
 
 export PARENT_ACCT=identicon.testnet
 export NEAR_ACCT=identicondapp.identicon.testnet
-export VALIDATOR_1=validator1.identicon.testnet
+export VALIDATOR_1=${PREFIX}validator1.identicon.testnet
 export VALIDATOR_2=validator2.identicon.testnet
 export VALIDATOR_3=validator3.identicon.testnet
 

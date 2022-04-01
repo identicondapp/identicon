@@ -320,6 +320,7 @@ impl VerificationContract {
         }
     }
 
+    
     /* Called by *Validators* */
 
     // Report the result of the verification. If the verification was not possible,
