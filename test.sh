@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-cargo test $1 -- --nocapture
+RUSTFLAGS='-A dead_code -A unused_variables -C link-arg=-s' cargo test $1 -- --nocapture

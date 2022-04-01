@@ -573,17 +573,17 @@ mod tests {
 
     #[allow(dead_code)]
     fn moq_validators_pool(mut contract: VerificationContract) -> VerificationContract {
-        contract.register_as_validator("rdelaros1.testnet".to_string());
-        contract.register_as_validator("rdelaros2.testnet".to_string());
-        contract.register_as_validator("rdelaros3.testnet".to_string());
-        contract.register_as_validator("rdelaros4.testnet".to_string());
-        contract.register_as_validator("rdelaros5.testnet".to_string());
-        contract.register_as_validator("rdelaros6.testnet".to_string());
-        contract.register_as_validator("rdelaros7.testnet".to_string());
-        contract.register_as_validator("rdelaros8.testnet".to_string());
-        contract.register_as_validator("rdelaros9.testnet".to_string());
-        contract.register_as_validator("rdelaros10.testnet".to_string());
-        contract.register_as_validator("rdelaros11.testnet".to_string());
+        contract.register_as_validator("validator01.testnet".to_string());
+        contract.register_as_validator("validator02.testnet".to_string());
+        contract.register_as_validator("validator03.testnet".to_string());
+        contract.register_as_validator("validator04.testnet".to_string());
+        contract.register_as_validator("validator05.testnet".to_string());
+        contract.register_as_validator("validator06.testnet".to_string());
+        contract.register_as_validator("validator07.testnet".to_string());
+        contract.register_as_validator("validator08.testnet".to_string());
+        contract.register_as_validator("validator09.testnet".to_string());
+        contract.register_as_validator("validator10.testnet".to_string());
+        contract.register_as_validator("validator11.testnet".to_string());
         contract
     }
 
@@ -592,7 +592,7 @@ mod tests {
         // Basic set up for a unit test
         testing_env!(VMContextBuilder::new().build());
         let subject_id = "ar_dni_12488353".to_string();
-        let requestor_id = "mariozito.testnet".to_string();
+        let requestor_id = "requestor01.testnet".to_string();
         let mut contract = VerificationContract::new();
 
         contract.request_verification(
@@ -629,11 +629,11 @@ mod tests {
         testing_env!(VMContextBuilder::new().build());
         let mut contract = VerificationContract::new();
 
-        contract.register_as_validator("rdelaros1.testnet".to_string());
-        contract.register_as_validator("rdelaros2.testnet".to_string());
-        contract.register_as_validator("rdelaros3.testnet".to_string());
-        contract.register_as_validator("rdelaros4.testnet".to_string());
-        contract.register_as_validator("rdelaros5.testnet".to_string());
+        contract.register_as_validator("validator01.testnet".to_string());
+        contract.register_as_validator("validator02.testnet".to_string());
+        contract.register_as_validator("validator03.testnet".to_string());
+        contract.register_as_validator("validator04.testnet".to_string());
+        contract.register_as_validator("validator05.testnet".to_string());
 
         log!(
             "\n---\ntest_register_validator {:?} {:?}",
@@ -648,10 +648,10 @@ mod tests {
         // Basic set up for a unit test
         testing_env!(VMContextBuilder::new().build());
         let subject_id = "ar_dni_12488353".to_string();
-        let requestor_id = "juanmescher.testnet".to_string();
-        let valid0 = "rdelaros2.testnet".to_string();
-        let valid1 = "rdelaros3.testnet".to_string();
-        let valid2 = "rdelaros4.testnet".to_string();
+        let requestor_id = "requestor01.testnet".to_string();
+        let valid0 = "validator02.testnet".to_string();
+        let valid1 = "validator03.testnet".to_string();
+        let valid2 = "validator04.testnet".to_string();
         let mut contract = VerificationContract::new();
 
         contract = moq_validators_pool(contract);
