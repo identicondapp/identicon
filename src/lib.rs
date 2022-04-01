@@ -594,6 +594,8 @@ mod tests {
         let requestor_id = "requestor01.testnet".to_string();
         let mut contract = VerificationContract::new();
 
+        contract = moq_validators_pool(contract);
+
         contract.request_verification(
             requestor_id.to_string(),
             VerificationType::ProofOfLife,
@@ -601,12 +603,12 @@ mod tests {
             moq_subject_info(),
         );
 
-        let request = contract.verifications.get(&subject_id).unwrap();
+        let request = contract.verifications.get(&subject_id.to_string()).unwrap();
         assert_eq!(request.requestor_id, requestor_id);
         assert_eq!(request.subject_id, subject_id);
-        assert_eq!(request.results.len(), 2);
+        assert_eq!(request.results.len(), 3);
         assert_eq!(contract.verifications.len(), 1);
-        assert_eq!(contract.assignments.len(), 2);
+        assert_eq!(contract.assignments.len(), 3);
     }
 
     #[test]
