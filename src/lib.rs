@@ -268,9 +268,8 @@ impl VerificationContract {
         );
     }
 
-
-    // After reception of all the validators results, we must pay each of the validators 
-    // the corresponding compensation (1 NEAR). Validators which did not complete 
+    // After reception of all the validators results, we must pay each of the validators
+    // the corresponding compensation (1 NEAR). Validators which did not complete
     // the verification (for whatever reason) will not receive payment.
     pub fn pay_validators(&mut self, requestor_id: RequestorId, subject_id: SubjectId) {
         log!(
@@ -320,11 +319,10 @@ impl VerificationContract {
         }
     }
 
-    
     /* Called by *Validators* */
 
     // Report the result of the verification. If the verification was not possible,
-    // or the validator will not do it then  the validator must include a 
+    // or the validator will not do it then  the validator must include a
     // descriptive cause.
     pub fn report_verification_result(
         &mut self,
@@ -350,26 +348,23 @@ impl VerificationContract {
         );
 
         let mut requested = self.verifications.get(&subject_id).unwrap();
-        
         let mut changed: Vec<VerificationResult> = Vec::new();
-        for before in requested.results.iter() { 
-            if before.validator_id == validator_id { 
+        for before in requested.results.iter() {
+            if before.validator_id == validator_id {
                 changed.push(VerificationResult {
                     validator_id: validator_id.to_string(),
                     result: stated.clone(),
                     timestamp: "2022-03-31 16:00:00".to_string(),
                 });
-            } 
-            else {
+            } else {
                 changed.push(before.clone());
             }
-        };
+        }
 
         // and update the full request state
         requested.results = changed.clone();
         self.verifications.insert(&subject_id, &requested);
     }
-
 
     /// Some NEAR account owner registers itself as a validator.
     pub fn register_as_validator(&mut self, validator_id: ValidatorId) {
@@ -380,7 +375,6 @@ impl VerificationContract {
     pub fn get_validators_count(&self) -> usize {
         self.validators.len()
     }
-
 
     /* Private */
 
@@ -393,24 +387,29 @@ impl VerificationContract {
         vec![val1, val2, val3]
     }
 
-
     // Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
     fn evaluate_results(&mut self, results: Vec<VerificationResult>) -> VerificationState {
         // first check if we have some pending result
-        if results.iter().any(|e| e.result == VerificationState::Pending) {
+        if results
+            .iter()
+            .any(|e| e.result == VerificationState::Pending)
+        {
             return VerificationState::Pending;
         }
 
         // now check if we have some of it rejected
-        match results.iter().find(|e| e.result == VerificationState::Rejected) {
-            Some(_) => { return VerificationState::Rejected },
-            None => { }
+        match results
+            .iter()
+            .find(|e| e.result == VerificationState::Rejected)
+        {
+            Some(_) => return VerificationState::Rejected,
+            None => {}
         }
 
         // check if we have the min required approvals
         let approvals: u8 = results.iter().fold(0, |count, _| count + 1);
         if approvals >= MIN_VALIDATORS {
-            return VerificationState::Approved
+            return VerificationState::Approved;
         }
 
         VerificationState::Pending
@@ -665,32 +664,34 @@ mod tests {
 
         // the second validator approved it
         contract.report_verification_result(
-            valid1.to_string(), 
+            valid1.to_string(),
             subject_id.to_string(),
             VerificationState::Approved,
-            "".to_string());
+            "".to_string(),
+        );
         let request = contract.verifications.get(&subject_id).unwrap();
         assert_eq!(request.results[1].result, VerificationState::Approved);
 
         // the third validator approved it
         contract.report_verification_result(
-            valid2.to_string(), 
+            valid2.to_string(),
             subject_id.to_string(),
             VerificationState::Approved,
-            "".to_string());
+            "".to_string(),
+        );
         let request = contract.verifications.get(&subject_id).unwrap();
         assert_eq!(request.results[2].result, VerificationState::Approved);
 
         // the first validator approved it
         contract.report_verification_result(
-            valid0.to_string(), 
+            valid0.to_string(),
             subject_id.to_string(),
             VerificationState::Approved,
-            "".to_string());
+            "".to_string(),
+        );
         let request = contract.verifications.get(&subject_id).unwrap();
         assert_eq!(request.results[0].result, VerificationState::Approved);
 
         log!("\ntest_report_verification_result: {:?}", request.results);
     }
-
 }
