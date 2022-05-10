@@ -1,6 +1,6 @@
 # NCAR - Bootcamp 09-05-2022 al 13-05-2022
 
-## Día 1 (Martes 10-May)
+### Día 1 (Martes 10-May)
 
 Clonar repo inicial para comenzar proyecto:
 ~~~
