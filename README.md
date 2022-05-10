@@ -1,5 +1,7 @@
 # Identicon protocol
 
+# Briefing
+
 **Identicon** is a **trustless protocol for identity verification in the OpenWeb**, focused on providing multiple signed verifications of a real world entity and binding it to one (or more) digital identities, and independent of the form these digital identities may take (NFT, DID, etc). It is not an identity vault or a repo for unique identity. 
 
 **Is based on a set of decentralized and random selection of human nodes (citizens) which will produce the “on-site” verification of the solicited identity, proof of life or proof of existence.**
@@ -12,11 +14,38 @@ Features:
 - Simplifies proof of identity requests and validation process on an intuitive and easy to use Dapp.
 - Allows recurrent validations (once a week, once a month, etc) to be scheduled and managed by the network.
 
-Opens a whole set of use cases, such as: validating the existence of physical assets, validating providers of goods and services and proving identity and life for validated users on social media platforms.
+Opens a whole set of use cases, such as: 
+
+- validating the existence of physical assets
+- validating providers of goods and services 
+- proving identity and life for validated users on social media platforms
+- provide KYC en Defi apps en regulated environments
 
 ## Disclaimer
 
 This is a naive and incomplete implementation of some methods of the Verification Contract, produced by the Team#10 (Juan Mescher & Mario Zito) of the *NEAR CERTIFIED DEVELOPER 28-03-2022 course*, and for the sole purpose of completing the required course tasks.
+
+It has been improved by applying NEAR best practices as detailed in: [NEAR SDK - Best practices](https://www.near-sdk.io/best-practices) but is still a simplified implementation, for the sole purpose of completing the required course tasks for the *NEAR CERTIFIED ARCHITECT 09-05-2022 bootcamp (NCAR)*. 
+
+## NCAR course activities
+
+All day to day activities along the NCAR will be documented and recorded in the [ACTIVITY.md]() document in the `docs/member` folder.
+
+All changes to code  will be recorded in the [docs/member/CHANGELOG.md]() document in the `docs/member` folder.
+
+**Branches and folders:**
+
+Ecah team member will have its own branch and documents folder in order to record personal course activities:
+
+- `Mario Zito` branch: `ncar/maz`, folder: `docs/maz`
+
+- `Juan Mescher` branch: `ncar/jm`, folder: `docs/jm`
+
+**Conventions**
+
+- All code documentation will use English as it is a globally used standard convention.
+
+- BUT **personal ACTIVIY, CHANGELOG and commit messages** will be written in Spanish, following the requirements of the **NEAR Hispano course guides**, and to be useful for other future particpants whoy may review this project.
 
 ## Concepts
 
