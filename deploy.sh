@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# Example: 
+# ./build.sh mariozito.testnet contract0.identicon.testnet 
 
 export PARENT=$1
 export CONTRACT=$2

@@ -7,3 +7,8 @@ Aquí solo se documentan cambios en:
 - herramientas de build y deploy.
 
 La mayor parte de estos cambios están registrados en los mensajes de `commit`,  pero aquí se provee una descripción más detallada.
+
+### Dia 1
+
+- Aplicados cambios en `Cargo.toml` para optimizar generación de codigo.
+
