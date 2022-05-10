@@ -157,3 +157,16 @@ pub struct VerificationRequest {
   pub results: Vec<VerificationResult>,
 }
 
+#[near_bindgen]
+#[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
+pub struct VerificationContract {
+  // the pending verifications as a iterable Map keyed by SubjectId
+  pub verifications: UnorderedMap<SubjectId, VerificationRequest>,
+
+  // the assigned validations, as a Map keyed by ValidatorId
+  // the value is a (variable) list of the SubjectIds to verify
+  pub assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
+
+  // the Pool of validators, as an array of ValidatorIds
+  pub validators: Vec<ValidatorId>,
+}

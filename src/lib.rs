@@ -5,29 +5,20 @@ use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, near_bindgen};
 use near_sdk::{AccountId, PanicOnDefault, Promise};
 
-use definitions::{
-  MAX_VALIDATORS, MIN_VALIDATORS, PRIZE_AMOUNT,
-  SubjectId, RequestorId, ValidatorId, ISODateTime, 
-  GPSCoordinates, ContactInfo, LocationInfo, TimeWindow, SubjectInfo, 
-  VerificationType, VerificationState, VerificationResult, VerificationRequest
-};
-
 mod definitions;
+mod requests;
 
+// this DOES NOT WORK, why ?
+// use definitions::{
+//   MAX_VALIDATORS, MIN_VALIDATORS, PRIZE_AMOUNT,
+//   SubjectId, RequestorId, ValidatorId, ISODateTime, 
+//   GPSCoordinates, ContactInfo, LocationInfo, TimeWindow, SubjectInfo, 
+//   VerificationType, VerificationState, VerificationResult, VerificationRequest
+//   , VerificationContract
+// };
+use definitions::*; // but this works, why ?
+//use requests::*;
 
-#[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
-pub struct VerificationContract {
-  // the pending verifications as a iterable Map keyed by SubjectId
-  pub verifications: UnorderedMap<SubjectId, VerificationRequest>,
-
-  // the assigned validations, as a Map keyed by ValidatorId
-  // the value is a (variable) list of the SubjectIds to verify
-  pub assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
-
-  // the Pool of validators, as an array of ValidatorIds
-  pub validators: Vec<ValidatorId>,
-}
 
 #[near_bindgen]
 impl VerificationContract {
@@ -43,7 +34,7 @@ impl VerificationContract {
 
     /* Called by *Requestor* */
 
-    // Registers the new request in the blockchain and assigns validators to verify it.
+/*     // Registers the new request in the blockchain and assigns validators to verify it.
     pub fn request_verification(
         &mut self,
         requestor_id: RequestorId,
@@ -123,7 +114,8 @@ impl VerificationContract {
             subject_id,
             validator_id
         );
-    }
+    } 
+    */
 
     // After reception of all the validators results, we must pay each of the validators
     // the corresponding compensation (1 NEAR). Validators which did not complete
@@ -235,14 +227,14 @@ impl VerificationContract {
 
     /* Private */
 
-    // When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request
-    fn assign_validators(&self, subject_id: SubjectId) -> Vec<ValidatorId> {
-        //Vec::new()
-        let val1: ValidatorId = self.validators[1].to_string();
-        let val2: ValidatorId = self.validators[2].to_string();
-        let val3: ValidatorId = self.validators[3].to_string();
-        vec![val1, val2, val3]
-    }
+    // // When the request is filled, we must select a number of validators at random from the validators pool, and assign them to the request
+    // fn assign_validators(&self, subject_id: SubjectId) -> Vec<ValidatorId> {
+    //     //Vec::new()
+    //     let val1: ValidatorId = self.validators[1].to_string();
+    //     let val2: ValidatorId = self.validators[2].to_string();
+    //     let val3: ValidatorId = self.validators[3].to_string();
+    //     vec![val1, val2, val3]
+    // }
 
     // Every time we receive a verification result we must evaluate if all verifications have been done, and which is the final result for the request. While the verifications are still in course the request state is Pending.
     fn evaluate_results(&mut self, results: Vec<VerificationResult>) -> VerificationState {

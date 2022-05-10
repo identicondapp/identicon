@@ -8,7 +8,8 @@ Aquí solo se documentan cambios en:
 
 La mayor parte de estos cambios están registrados en los mensajes de `commit`,  pero aquí se provee una descripción más detallada.
 
-### Dia 1
+### Día 1
 
 - Aplicados cambios en `Cargo.toml` para optimizar generación de codigo.
-- Definición de tipos, structs y constantes en `definitions.rs`
+- REFACTORING: Definición de tipos, structs y constantes pasa a `definitions.rs`
+- REFACTORING: `request_verification` y sus privates pasan a `requests.rs`
