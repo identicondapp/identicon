@@ -11,4 +11,4 @@ La mayor parte de estos cambios están registrados en los mensajes de `commit`, 
 ### Dia 1
 
 - Aplicados cambios en `Cargo.toml` para optimizar generación de codigo.
-
+- Definición de tipos, structs y constantes en `definitions.rs`

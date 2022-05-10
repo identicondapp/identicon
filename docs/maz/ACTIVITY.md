@@ -38,7 +38,7 @@ Verificar que estan aplicados los cambios en `Cargo.toml`
 - `panic = "abort"`: OK
 - `overflow-checks = true`: OK
 
-Se modifica `near-sdk = "=4.0.0-pre.5" basado en ejemplo provisto.
+Se modifica `near-sdk = "=4.0.0-pre.5"` basado en ejemplo provisto.
 
 Se agrega `serde_json = "1.0"`y `near-sys = "0.1.0"`
 
