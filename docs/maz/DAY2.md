@@ -310,7 +310,7 @@ result.status.SuccessValue: 0
 
 Aprobar la propuesta:
 
-![Captura de propuesta aprobada](./Captura2022-05-11.png)
+![Captura de propuesta aprobada](https://github.com/identicondapp/identicon/blob/ncar/maz/docs/maz/Captura-2022-05-11.png)
 
 Verificar transacciones en Explorer:
 ~~~
