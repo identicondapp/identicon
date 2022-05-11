@@ -23,4 +23,5 @@ La mayor parte de estos cambios están registrados en los mensajes de `commit`, 
 
 - CAMBIOS: agregar 'cards' a `VerificationContract` 
 - CAMBIOS: agregar codigo para migracion
-- 
+- CAMBIOS: agregar codigo para upgrade desde DAO
+
