@@ -267,5 +267,21 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 **Implementar buenas pácticas en código**
 
-- `overflow-checks=true`: OK (ya estaba en Cargo.toml)
+FLAGS: `overflow-checks=true`: OK (ya estaba en Cargo.toml)
+
+Problema al refactorizar codigo:
+~~~
+// this DOES NOT WORK, why ?
+use definitions::{
+  MAX_VALIDATORS, MIN_VALIDATORS, PRIZE_AMOUNT,
+  SubjectId, RequestorId, ValidatorId, ISODateTime,
+  GPSCoordinates, ContactInfo, LocationInfo, TimeWindow, SubjectInfo,
+  VerificationType, VerificationState, VerificationResult, VerificationRequest
+  , VerificationContract
+};
+
+// but this works, why ?
+use definitions::*; 
+~~~
+
 

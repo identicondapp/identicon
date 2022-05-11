@@ -2,7 +2,7 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, near_bindgen};
-use near_sdk::{AccountId, PanicOnDefault, Promise};
+use near_sdk::{AccountId, PanicOnDefault};
 
 // The Subject government identification as a string formed
 // using 'type'+'number'+'country', ex: 'dni:12488353:ar'
@@ -21,45 +21,45 @@ pub type ISODateTime = String;
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct GPSCoordinates {
-  pub long: String,
-  pub lat: String,
+    pub long: String,
+    pub lat: String,
 }
 
 // A naive implementation for the Subject Contact info
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct ContactInfo {
-  pub phones: String,
-  pub email: String,
+    pub phones: String,
+    pub email: String,
 }
 
 // A naive implementation for the subject Address location
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct LocationInfo {
-  pub directions: String, // ex: 'Calle Las Lomitas Nro. 23 e/ Pampa y La Via'
-  pub city: String,
-  pub province: String,
-  pub country: String, // ex 'mx', 'ar', 've', 'bo', cl', 'uy', ...
-  pub coordinates: GPSCoordinates,
+    pub directions: String, // ex: 'Calle Las Lomitas Nro. 23 e/ Pampa y La Via'
+    pub city: String,
+    pub province: String,
+    pub country: String, // ex 'mx', 'ar', 've', 'bo', cl', 'uy', ...
+    pub coordinates: GPSCoordinates,
 }
 
 // The Time Window in which the verification must be performed
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct TimeWindow {
-  pub starts: ISODateTime,
-  pub ends: ISODateTime,
+    pub starts: ISODateTime,
+    pub ends: ISODateTime,
 }
 
 // All the relevant Subject information
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct SubjectInfo {
-  pub age: u8,
-  pub sex: String,
-  pub contact: ContactInfo,
-  pub address: LocationInfo,
+    pub age: u8,
+    pub sex: String,
+    pub contact: ContactInfo,
+    pub address: LocationInfo,
 }
 
 // The different verification services
@@ -126,47 +126,47 @@ pub const PRIZE_AMOUNT: u128 = 1_000_000_000_000_000_000_000_000;
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct VerificationResult {
-  pub validator_id: ValidatorId,
-  pub result: VerificationState,
-  pub timestamp: ISODateTime,
+    pub validator_id: ValidatorId,
+    pub result: VerificationState,
+    pub timestamp: ISODateTime,
 }
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct VerificationRequest {
-  // the verification service required, which may include additional info
-  // for some types such as ProofOfOwnership(asset) or ProofOfService(service).
-  pub is_type: VerificationType,
+    // the verification service required, which may include additional info
+    // for some types such as ProofOfOwnership(asset) or ProofOfService(service).
+    pub is_type: VerificationType,
 
-  // this is the account who requested the verification and will pay for it,
-  // and is NOT the same as the subject to be verified.
-  pub requestor_id: RequestorId,
+    // this is the account who requested the verification and will pay for it,
+    // and is NOT the same as the subject to be verified.
+    pub requestor_id: RequestorId,
 
-  // this is the subject to be verified, which is ALLWAYS a real human being,
-  // cats, dogs and other pets may be considered in the future :-)
-  pub subject_id: SubjectId,
-  pub subject_info: SubjectInfo,
-  pub when: TimeWindow,
+    // this is the subject to be verified, which is ALLWAYS a real human being,
+    // cats, dogs and other pets may be considered in the future :-)
+    pub subject_id: SubjectId,
+    pub subject_info: SubjectInfo,
+    pub when: TimeWindow,
 
-  // the verification state of the whole request, as a result of the individual
-  // verifications. If any of the individual verifications is Rejected, then the
-  // whole verification is Rejected.
-  pub state: VerificationState,
+    // the verification state of the whole request, as a result of the individual
+    // verifications. If any of the individual verifications is Rejected, then the
+    // whole verification is Rejected.
+    pub state: VerificationState,
 
-  // the array [MIN_VALIDATORS..MAX_VALIDATORS] of individual validator verifications
-  pub results: Vec<VerificationResult>,
+    // the array [MIN_VALIDATORS..MAX_VALIDATORS] of individual validator verifications
+    pub results: Vec<VerificationResult>,
 }
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
 pub struct VerificationContract {
-  // the pending verifications as a iterable Map keyed by SubjectId
-  pub verifications: UnorderedMap<SubjectId, VerificationRequest>,
+    // the pending verifications as a iterable Map keyed by SubjectId
+    pub verifications: UnorderedMap<SubjectId, VerificationRequest>,
 
-  // the assigned validations, as a Map keyed by ValidatorId
-  // the value is a (variable) list of the SubjectIds to verify
-  pub assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
+    // the assigned validations, as a Map keyed by ValidatorId
+    // the value is a (variable) list of the SubjectIds to verify
+    pub assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
 
-  // the Pool of validators, as an array of ValidatorIds
-  pub validators: Vec<ValidatorId>,
+    // the Pool of validators, as an array of ValidatorIds
+    pub validators: Vec<ValidatorId>,
 }

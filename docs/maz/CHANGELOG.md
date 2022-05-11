@@ -10,6 +10,7 @@ La mayor parte de estos cambios están registrados en los mensajes de `commit`, 
 
 ### Día 1
 
-- Aplicados cambios en `Cargo.toml` para optimizar generación de codigo.
+- FLAGS/DEPS: Aplicados cambios en `Cargo.toml` para optimizar generación de codigo.
 - REFACTORING: Definición de tipos, structs y constantes pasa a `definitions.rs`
 - REFACTORING: `request_verification` y sus privates pasan a `requests.rs`
+- 
