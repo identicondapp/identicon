@@ -1,6 +1,6 @@
 use near_sdk::log;
 use near_sdk::{env, near_bindgen};
-use near_sdk::{AccountId, PanicOnDefault, Promise};
+use near_sdk::{AccountId, Promise};
 
 use crate::definitions::*;
 

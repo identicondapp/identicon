@@ -1,8 +1,8 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
+use near_sdk::near_bindgen;
 use near_sdk::serde::{Deserialize, Serialize};
-use near_sdk::{env, near_bindgen};
-use near_sdk::{AccountId, PanicOnDefault};
+use near_sdk::PanicOnDefault;
 
 // The Subject government identification as a string formed
 // using 'type'+'number'+'country', ex: 'dni:12488353:ar'

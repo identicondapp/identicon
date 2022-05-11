@@ -5,8 +5,8 @@
 **A realizar**
 
 - `HECHO` Clona el repositorio de Github, compila y despliega el contrato. 
-- Crea la estructura de archivos para tu contrato inteligente, es decir, los archivos migrate.rs, internals.rs, enumerations.rs y los que consideres necesarios.
-- `PROCESO` Implementa las buenas prácticas recomendadas por el Protocolo de NEAR para el lenguaje de programación Rust. 
+- `HECHO` Crea la estructura de archivos para tu contrato inteligente, es decir, los archivos migrate.rs, internals.rs, enumerations.rs y los que consideres necesarios.
+- `HECHO` Implementa las buenas prácticas recomendadas por el Protocolo de NEAR para el lenguaje de programación Rust. 
 - `HECHO` Corrige el archivo **Cargo.toml** para optimizar el peso del archivo compilado.
 - ¡Compila y Despliega tu contrato para realizar las pruebas necesarias y seguir añadiendo las herramientas para escalabilidad y mantenimiento para tu DApp!
 
@@ -284,4 +284,95 @@ use definitions::{
 use definitions::*; 
 ~~~
 
+Se refactorizado el codigo en:
 
+- `lib.rs`: root del proyecto que implementa inicializacion del contrato.
+- `definitions.rs`: definiciones de datos (tipos, structs y constantes).
+- `requests.rs`: metodos usados por el **solicitante**.
+- `validators.rs`: metodos usado por los **validadores**.
+- `payments.rs`: contiene el pago a validadores. incluyendo Promise y XCC.
+- `test.js`: tests unitarios.
+
+Se verifico el uso de `assert!` y `log!` en la mayoría de los metodos implementados.
+
+Se corrieron los test unitarios en forma continua durante la refactorizacion y al final:
+~~~
+mzito@mariodesk:~/dev/learn/near/NCAR-Bootcamp-05-2022$ cargo fmt
+mzito@mariodesk:~/dev/learn/near/NCAR-Bootcamp-05-2022$ ./test.sh
+   Compiling identicon v0.2.0 (/home/mzito/dev/learn/near/NCAR-Bootcamp-05-2022)
+    Finished test [unoptimized + debuginfo] target(s) in 1.61s
+     Running unittests (target/debug/deps/identicon-8b52b262c817c864)
+
+running 4 tests
+
+initialized contract state: [verifications], [assignments], [validators]
+
+pay_validators: Called method pay_validators("requestor01.testnet" "subject01.testnet")
+pay_validators: Verification found for subject_id "subject01.testnet" with state: Pending
+pay_validators: Payable validator found "validator01.testnet"
+
+initialized contract state: [verifications], [assignments], [validators]
+"validator01.testnet"
+"validator02.testnet"
+"validator03.testnet"
+"validator04.testnet"
+"validator05.testnet"
+"validator06.testnet"
+"validator07.testnet"
+"validator08.testnet"
+"validator09.testnet"
+"validator10.testnet"
+"validator11.testnet"
+
+request_verification: Called method request_verification("requestor01.testnet" ProofOfLife "ar_dni_12488353")
+request_verification: Assign selected validators ["validator02.testnet", "validator03.testnet", "validator04.testnet"]
+request_verification: Assigned subject "ar_dni_12488353" to validator "validator02.testnet"
+
+initialized contract state: [verifications], [assignments], [validators]
+"validator01.testnet"
+"validator02.testnet"
+"validator03.testnet"
+"validator04.testnet"
+request_verification: Assigned subject "ar_dni_12488353" to validator "validator03.testnet"
+request_verification: Assigned subject "ar_dni_12488353" to validator "validator04.testnet"
+request_verification: Added to verifications list VerificationRequest { is_type: ProofOfLife, requestor_id: "requestor01.testnet", subject_id: "ar_dni_12488353", subject_info: SubjectInfo { age: 65, sex: "M", contact: ContactInfo { phones: "+54-11-6549-4xxx", email: "mazito.v2@gmail.com" }, address: LocationInfo { directions: "Calle Las Lomitas Nro. 23 e/ Pampa y La Via", city: "Adrogue", province: "Buenos Aires", country: "ar", coordinates: GPSCoordinates { long: "", lat: "" } } }, when: TimeWindow { starts: "2022-03-28 00:00:00", ends: "2022-03-31 15:00:00" }, state: Pending, results: [VerificationResult { validator_id: "validator02.testnet", result: Pending, timestamp: "" }, VerificationResult { validator_id: "validator03.testnet", result: Pending, timestamp: "" }, VerificationResult { validator_id: "validator04.testnet", result: Pending, timestamp: "" }] }
+test tests::tests::test_request_verification ... "validator05.testnet"
+ok
+
+---
+test_register_validator 5 ["validator01.testnet", "validator02.testnet", "validator03.testnet", "validator04.testnet", "validator05.testnet"]
+
+initialized contract state: [verifications], [assignments], [validators]
+test tests::tests::test_register_validators ... ok"validator01.testnet"
+
+"validator02.testnet"
+"validator03.testnet"
+"validator04.testnet"
+"validator05.testnet"
+"validator06.testnet"
+"validator07.testnet"
+"validator08.testnet"
+"validator09.testnet"
+"validator10.testnet"
+"validator11.testnet"
+
+request_verification: Called method request_verification("requestor01.testnet" ProofOfLife "ar_dni_12488353")
+request_verification: Assign selected validators ["validator02.testnet", "validator03.testnet", "validator04.testnet"]
+request_verification: Assigned subject "ar_dni_12488353" to validator "validator02.testnet"
+request_verification: Assigned subject "ar_dni_12488353" to validator "validator03.testnet"
+request_verification: Assigned subject "ar_dni_12488353" to validator "validator04.testnet"
+request_verification: Added to verifications list VerificationRequest { is_type: ProofOfLife, requestor_id: "requestor01.testnet", subject_id: "ar_dni_12488353", subject_info: SubjectInfo { age: 65, sex: "M", contact: ContactInfo { phones: "+54-11-6549-4xxx", email: "mazito.v2@gmail.com" }, address: LocationInfo { directions: "Calle Las Lomitas Nro. 23 e/ Pampa y La Via", city: "Adrogue", province: "Buenos Aires", country: "ar", coordinates: GPSCoordinates { long: "", lat: "" } } }, when: TimeWindow { starts: "2022-03-28 00:00:00", ends: "2022-03-31 15:00:00" }, state: Pending, results: [VerificationResult { validator_id: "validator02.testnet", result: Pending, timestamp: "" }, VerificationResult { validator_id: "validator03.testnet", result: Pending, timestamp: "" }, VerificationResult { validator_id: "validator04.testnet", result: Pending, timestamp: "" }] }
+
+report_verification_result: Called method ("validator03.testnet" "ar_dni_12488353" Approved)
+pay_validators: Payable validator found "validator02.testnet"
+
+report_verification_result: Called method ("validator04.testnet" "ar_dni_12488353" Approved)
+test tests::tests::test_pay_validators ... ok
+
+report_verification_result: Called method ("validator02.testnet" "ar_dni_12488353" Approved)
+
+test_report_verification_result: [VerificationResult { validator_id: "validator02.testnet", result: Approved, timestamp: "2022-03-31 16:00:00" }, VerificationResult { validator_id: "validator03.testnet", result: Approved, timestamp: "2022-03-31 16:00:00" }, VerificationResult { validator_id: "validator04.testnet", result: Approved, timestamp: "2022-03-31 16:00:00" }]
+test tests::tests::test_report_verification_result ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s 
+~~~
