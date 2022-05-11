@@ -7,10 +7,11 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 export PARENT=$1
-export CONTRACT=contract0.$PARENT
-export REQUESTOR_ID=jmescher.testnet
+export CONTRACT=contract_v1.$PARENT
+export REQUESTOR_ID=maz.testnet
 
-./deploy.sh $PARENT $CONTRACT
+# WILL NOT DO: deploy must be done BEFORE running this
+#./deploy.sh $PARENT $CONTRACT
 
 # 0. Delete / Create testing subaccounts for validators
 near state validator01.$PARENT && near delete validator01.$PARENT $PARENT
