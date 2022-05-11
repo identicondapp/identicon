@@ -17,6 +17,9 @@ pub type ValidatorId = String;
 // A DateTime in ISO format 'AAAA-MM-DD hh:mm:ss', ex: '2022-03-27 00:00:00'
 pub type ISODateTime = String;
 
+// A Unique ID key (IPFS content-hash) for files stored in Web3.storage or equivalent
+pub type FileId = String;
+
 // The location coordinates as obtained from GoogleMaps/other
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
 #[serde(crate = "near_sdk::serde")]
@@ -160,6 +163,22 @@ pub struct VerificationRequest {
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
 pub struct VerificationContract {
+    // the pending verifications as a iterable Map keyed by SubjectId
+    pub verifications: UnorderedMap<SubjectId, VerificationRequest>,
+
+    // the assigned validations, as a Map keyed by ValidatorId
+    // the value is a (variable) list of the SubjectIds to verify
+    pub assignments: UnorderedMap<ValidatorId, Vec<SubjectId>>,
+
+    // the Pool of validators, as an array of ValidatorIds
+    pub validators: Vec<ValidatorId>,
+
+    // emited certification cards for approved subjects
+    pub cards: UnorderedMap<SubjectId, FileId>
+}
+
+#[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
+pub struct VerificationContractV1 {
     // the pending verifications as a iterable Map keyed by SubjectId
     pub verifications: UnorderedMap<SubjectId, VerificationRequest>,
 
