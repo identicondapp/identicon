@@ -276,3 +276,68 @@ Transaction Id 2tdSuqfEetgSM6JgDsvWa5XTP2utXjYg6aNjV8f8otW8
 To see the transaction in the transaction explorer, please open this url in your browser https://explorer.testnet.near.org/transactions/2tdSuqfEetgSM6JgDsvWa5XTP2utXjYg6aNjV8f8otW8
 ~~~
 
+### Actualizar contrato desde SputnikDAO
+
+Instalar `CLI SputnikDAO v2` en otra carpeta y generar link:
+~~~
+mkdir ~/dev/learn/near/identicondao
+cd ~/dev/learn/near/identicondao
+git clone https://github.com/cloudmex/sputnikdao-cli.git ./
+rm -rf node_modules
+rm package-lock.json 
+npm i
+npm run build
+npm link
+~~~
+
+Volver a este espacio y vincular el CLI:
+~~~
+cd ~/dev/learn/near/NCAR-Bootcamp-05-2022
+sudo npm link sputnikdao
+~~~
+
+Ya podemos usar `CLI sputnikdao`:
+~~~
+mzito@mariodesk:~/dev/learn/near/NCAR-Bootcamp-05-2022$ sputnikdao proposal upgrade res/identicon.wasm contract_v1.identicon.testnet --daoAcc identicon --accountId identicon.testnet
+call identicon.sputnikv2.testnet store_blob [Uint8Array] --accountId identicon.testnet -gas:200 --amount:2.204
+
+result.status.SuccessValue: "8JJKuKYBSJsgvjaU2MfyDLGdkH8wAhfV6dkdiPeofGWQ"
+call identicon.sputnikv2.testnet add_proposal {"proposal":{"target":"contract_v1.identicon.testnet","description":"Upgrade code","kind":{"UpgradeRemote":{"receiver_id":"contract_v1.identicon.testnet","method_name":"upgrade","hash":"8JJKuKYBSJsgvjaU2MfyDLGdkH8wAhfV6dkdiPeofGWQ"}}}} --accountId identicon.testnet -gas:200 --amount:1
+
+result.status.SuccessValue: 0
+0
+~~~
+
+Aprobar la propuesta\n
+![Captura de propuesta aprobada](./Captura de pantalla de 2022-05-11 16-33-02.png)
+
+Verificar transacciones en Explorer:
+~~~
+Called method: 'act_proposal' in contract: ident…v2.testnet
+by maz.testnet
+H8GJZDn... Succeeded 1hr ago
+
+Called method: 'add_proposal' in contract: ident…v2.testnet
+by identicon.testnet
+5M1V5rr... Succeeded 1hr ago
+
+Called method: 'store_blob' in contract: ident…v2.testnet 
+by identicon.testnet
+ExjjZZj... Succeeded 1hr ago
+
+New key added for identicon.testnet: ed25519:EfdQ8F4... with permission FullAccess
+by identicon.testnet
+76mm9FD... Succeeded 1hr ago
+
+New key added for identicon.testnet: ed25519:AMYMBf2... with permission FullAccess
+by identicon.testnet
+5da5cjb... Succeeded 2hr ago
+
+Called method: 'create' in contract: sputnikv2.testnet 
+by identicon.testnet
+72Tkifh... Succeeded 2hr ago
+
+Access key added for contract sputnikv2.testnet: ed25519:H4ysynM... with permission to call any methods
+by identicon.testnet
+5HAsCAG... Succeeded 2hr ago
+~~~

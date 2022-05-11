@@ -10,7 +10,7 @@
 - `HECHO` Corrige el archivo **Cargo.toml** para optimizar el peso del archivo compilado.
 - `HECHO` ¡Compila y Despliega tu contrato para realizar las pruebas necesarias y seguir añadiendo las herramientas para escalabilidad y mantenimiento para tu DApp!
 
-**Realizado en**: [DAY1](./DAY1.md)
+**Realizado en**: [Día 1](./DAY1.md)
 
 ### Día 2 (Miercoles 11-May)
 
@@ -18,6 +18,9 @@ NOTA: se adelantan aquí las actividades pensadas para el tercer día, por estra
 
 **A realizar**
 
-- Añade un cambio en la estructura de tu contrato e implementa el método migrate.
-- Despliega el contrato con los cambios realizados con el comando llamando como función inicial al método migrate.
-- Crea una DAO en [SputnikDAO 2](https://testnet-v2.sputnik.fund/#/), realiza cambios en el contrato y haz una propuesta para actualizar un contrato. 
+- `HECHO` Añade un cambio en la estructura de tu contrato e implementa el método migrate.
+- `HECHO` Despliega el contrato con los cambios realizados con el comando llamando como función inicial al método migrate.
+- `HECHO` Crea una DAO en [SputnikDAO 2](https://testnet-v2.sputnik.fund/#/), realiza cambios en el contrato y haz una propuesta para actualizar un contrato. 
+
+**Realizado en**: [Día 2](./DAY2.md)
+
