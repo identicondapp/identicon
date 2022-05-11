@@ -4,14 +4,12 @@
 
 ### HOY
 
-FACIL: compiler and build flags options
+- Agregar un campo a `VerificationResult` para contener file con resultado de cada verificacion (imagenes incluidas).
+- Agregar un campo a `VerificationRequest` para contener imagen de tarjeta final.
+- Analizar migracion y update
 
-DIFICIL: log, asserts, etc ...
+### DESPUES
 
-MEDIO: separar codigo, rebuilds, deploy
-
-- Dividir codigo en varios archivos
-- Implementar uso de `log!`
-- Implementar uso de `assert!`
-- Retornar Promise en Cross Contract calls
-
+- TheGraph
+- Imagenes
+- XCC y Promise

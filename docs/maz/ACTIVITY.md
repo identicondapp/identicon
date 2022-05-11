@@ -116,7 +116,7 @@ test tests::test_pay_validators ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 ~~~
 
-**Implementar buenas pácticas en código**
+**Implementar buenas prácticas en código**
 
 FLAGS: `overflow-checks=true`: OK (ya estaba en Cargo.toml)
 
@@ -146,7 +146,7 @@ Se refactorizó el código en:
 
 Se verifico el uso de `assert!` y `log!` en la mayoría de los metodos implementados.
 
-Se corrieron los test unitarios en forma continua durante la refactorizacion y al final:
+Se corrieron los test unitarios en forma continua durante la refactorización y al final:
 ~~~
 mzito@mariodesk:~/dev/learn/near/NCAR-Bootcamp-05-2022$ cargo fmt
 mzito@mariodesk:~/dev/learn/near/NCAR-Bootcamp-05-2022$ ./test.sh
