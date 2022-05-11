@@ -308,8 +308,9 @@ result.status.SuccessValue: 0
 0
 ~~~
 
-Aprobar la propuesta\n
-![Captura de propuesta aprobada](./Captura de pantalla de 2022-05-11 16-33-02.png)
+Aprobar la propuesta:
+
+![Captura de propuesta aprobada](./Captura2022-05-11.png)
 
 Verificar transacciones en Explorer:
 ~~~
