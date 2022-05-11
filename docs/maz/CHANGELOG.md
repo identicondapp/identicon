@@ -18,3 +18,9 @@ La mayor parte de estos cambios están registrados en los mensajes de `commit`, 
 - REFACTORING: mover tests
 - FIXES: corregir uso de `log!` y `assert!` cuando no fue usado
 - CLEANUP: limpiar deps no usadas y warns, aplicar `cargo ftm`
+
+### Día 2 (11-05-2022)
+
+- CAMBIOS: agregar 'cards' a `VerificationContract` 
+- CAMBIOS: agregar codigo para migracion
+- 

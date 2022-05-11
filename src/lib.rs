@@ -6,6 +6,7 @@ mod definitions;
 mod payments;
 mod requests;
 mod validators;
+mod upgrades;
 use definitions::*;
 
 #[cfg(test)]
@@ -22,8 +23,8 @@ impl VerificationContract {
             assignments: UnorderedMap::new(b"u"),
             validators: Vec::new(),
 
-            // this is the new addition to the Contract 
-            cards: UnorderedMap::new(b"v"), 
+            // this is the new addition to the Contract
+            cards: UnorderedMap::new(b"v"),
         }
     }
 
@@ -39,7 +40,7 @@ impl VerificationContract {
             validators: old_state.validators,
 
             // now initialize the new 'cards' map
-            cards: UnorderedMap::new(b"v"), 
+            cards: UnorderedMap::new(b"v"),
         }
     }
 

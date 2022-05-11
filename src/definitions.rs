@@ -174,7 +174,7 @@ pub struct VerificationContract {
     pub validators: Vec<ValidatorId>,
 
     // emited certification cards for approved subjects
-    pub cards: UnorderedMap<SubjectId, FileId>
+    pub cards: UnorderedMap<SubjectId, FileId>,
 }
 
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault, Debug)]
