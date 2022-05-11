@@ -135,14 +135,14 @@ use definitions::{
 use definitions::*; 
 ~~~
 
-Se refactorizado el codigo en:
+Se refactorizó el código en:
 
 - `lib.rs`: root del proyecto que implementa inicializacion del contrato.
 - `definitions.rs`: definiciones de datos (tipos, structs y constantes).
 - `requests.rs`: metodos usados por el **solicitante**.
 - `validators.rs`: metodos usado por los **validadores**.
-- `payments.rs`: contiene el pago a validadores. incluyendo Promise y XCC.
-- `test.js`: tests unitarios.
+- `payments.rs`: contiene el pago a validadores, incluyendo Promise y XCC.
+- `test.rs`: tests unitarios.
 
 Se verifico el uso de `assert!` y `log!` en la mayoría de los metodos implementados.
 
