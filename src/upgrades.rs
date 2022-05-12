@@ -12,7 +12,7 @@ impl VerificationContract {
     #[cfg(target_arch = "wasm32")]
     pub fn upgrade(self) {
         use near_sys as sys;
-        assert!(env::predecessor_account_id() == self.owner_id);
+        // assert!(env::predecessor_account_id() == self.owner_id);
         log!("\nupgrade:: upgrading from DAO government");
 
         //input is code:<Vec<u8> on REGISTER 0

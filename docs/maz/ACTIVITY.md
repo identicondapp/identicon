@@ -24,3 +24,13 @@ NOTA: se adelantan aquí las actividades pensadas para el tercer día, por estra
 
 **Realizado en**: [Día 2](./DAY2.md)
 
+### Día 3 (Jueves 12-May)
+
+- La primer actividad del día será crear un subgrafo en The Graph, realizar su despliegue, su configuración, y el mapeo necesarios para leer información del [NCAR-Example](https://github.com/open-web-academy/NCAR-Example) con las modificaciones realizadas el día de ayer.
+    - La manera de montar un subgrafo es algo extensa, así que, aquí te dejamos un tutorial de cómo realizarlo
+        
+        [Creación de un nodo en The Graph](https://www.notion.so/Creaci-n-de-un-nodo-en-The-Graph-9ac3f2c4745c479c8c629901e580439b)
+        
+- Después de montar el subgrafo, elige cualquier servidor **IPFS** para subir un contenido digital, obtener un hash único y añadirlo como dato en la estructura de tu contrato ejemplo.
+- La última actividad consta de un trabajo en equipo o individual, en este caso se crearán los métodos para realizar un Cross Contract Callback, puede ser implementado todo en el mismo contrato o se trabajará a la par con alguien más y una parte del código será implementado en el contrato que realiza la llamada y la otra será en el contrato que reciba la llamada.
+

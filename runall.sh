@@ -7,34 +7,34 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 export PARENT=$1
-export CONTRACT=contract0.$PARENT
-export REQUESTOR_ID=jmescher.testnet
+export CONTRACT=contract_v2.$PARENT
+export REQUESTOR_ID=maz.testnet
 
-./deploy.sh $PARENT $CONTRACT
+#./deploy.sh $PARENT $CONTRACT
 
 # 0. Delete / Create testing subaccounts for validators
-near state validator01.$PARENT && near delete validator01.$PARENT $PARENT
-near state validator02.$PARENT && near delete validator02.$PARENT $PARENT
-near state validator03.$PARENT && near delete validator03.$PARENT $PARENT
-near state validator04.$PARENT && near delete validator04.$PARENT $PARENT
-near state validator05.$PARENT && near delete validator05.$PARENT $PARENT
-near state validator06.$PARENT && near delete validator06.$PARENT $PARENT
-near state validator07.$PARENT && near delete validator07.$PARENT $PARENT
-near state validator08.$PARENT && near delete validator08.$PARENT $PARENT
-
-near create-account validator01.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator02.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator03.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator04.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator05.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator06.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator07.$PARENT --initialBalance 5 --masterAccount $PARENT
-near create-account validator08.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near state validator01.$PARENT && near delete validator01.$PARENT $PARENT
+# near state validator02.$PARENT && near delete validator02.$PARENT $PARENT
+# near state validator03.$PARENT && near delete validator03.$PARENT $PARENT
+# near state validator04.$PARENT && near delete validator04.$PARENT $PARENT
+# near state validator05.$PARENT && near delete validator05.$PARENT $PARENT
+# near state validator06.$PARENT && near delete validator06.$PARENT $PARENT
+# near state validator07.$PARENT && near delete validator07.$PARENT $PARENT
+# near state validator08.$PARENT && near delete validator08.$PARENT $PARENT
+# 
+# near create-account validator01.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator02.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator03.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator04.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator05.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator06.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator07.$PARENT --initialBalance 5 --masterAccount $PARENT
+# near create-account validator08.$PARENT --initialBalance 5 --masterAccount $PARENT
 
 # 1. Initialize contract
 near call $CONTRACT new --accountId $PARENT
 
-# 2. Regsiter some validators 
+# 2. Register some validators 
 near call $CONTRACT register_as_validator '{"validator_id":"validator01.'$PARENT'"}'  --accountId $PARENT
 near call $CONTRACT register_as_validator '{"validator_id":"validator02.'$PARENT'"}'  --accountId $PARENT
 near call $CONTRACT register_as_validator '{"validator_id":"validator03.'$PARENT'"}'  --accountId $PARENT
