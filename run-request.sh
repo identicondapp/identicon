@@ -12,7 +12,7 @@
 #
 export PARENT=$1
 export NID=$2
-export CONTRACT=contract_v2.identicon.testnet
+export CONTRACT=contract_v3.identicon.testnet
 export SUBJECT_ID=ar_dni_12488$NID
 export REQUESTOR_ID=$1
 

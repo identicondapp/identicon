@@ -1,6 +1,6 @@
+use crate::definitions::*;
 use near_sdk::serde_json;
 use near_sdk::{env, log, Gas, Promise, PromiseResult};
-use crate::definitions::*;
 
 /*
  * the rest of this file sets up unit tests
@@ -274,8 +274,8 @@ mod tests {
         let subject_info = &moq_subject_info();
         let contract_name = "contract_v2.identicon.testnet";
         let method_name = "request_verification";
-        
-        // We will call this method  but on an different version of the already 
+
+        // We will call this method  but on an different version of the already
         // deployed contract (contract_v2)
         // contract.request_verification(
         //     requestor_id.to_string(),
@@ -288,31 +288,50 @@ mod tests {
         let prepaid_gas = env::prepaid_gas() - XCC_CALL_GAS;
 
         // set the AccountId to be used in the XCC call
-        // which for our case is the deployed contract 
+        // which for our case is the deployed contract
         let contract_id: AccountId = contract_name.parse().unwrap();
 
-        // but we need to serialize the params 
-        let params: Vec<u8> = serde_json::to_vec(&(  
-          requestor_id.to_string(),
-          VerificationType::ProofOfLife,
-          subject_id.to_string(),
-          subject_info,
-        )).unwrap();
+        // but we need to serialize the params
+        let params: Vec<u8> = serde_json::to_vec(&(
+            requestor_id.to_string(),
+            VerificationType::ProofOfLife,
+            subject_id.to_string(),
+            subject_info,
+        ))
+        .unwrap();
 
         // make the XCC call
         let promise_idx = env::promise_create(
-          contract_id.clone(),  // the account id
-          method_name,          // the method to call on the contract
-          &params,       // the serialized method params
-          0,
-          prepaid_gas,
-        );        
+            contract_id.clone(), // the account id
+            method_name,         // the method to call on the contract
+            &params,             // the serialized method params
+            0,
+            prepaid_gas,
+        );
 
         log!("\ntest_xcc_request_verification_result_low_level: promise_id={:?} \ncall={:?} method{:?} \nserialized={:?}", 
           promise_idx,
-          contract_id, 
-          method_name, 
-          params.clone(), 
+          contract_id,
+          method_name,
+          params.clone(),
         );
     }
+
+    #[test]
+    fn test_bind_card_file() {
+        // Basic set up for the unit test
+        testing_env!(VMContextBuilder::new().build());
+        let subject_id = "ar_dni_12488401".to_string();
+        let card_id = "Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW".to_string();
+
+        let mut contract = VerificationContract::new();
+        contract.bind_card_file(
+          subject_id.to_string(), 
+          card_id.to_string());
+
+        log!("\ntest_bind_card_file: subject_id={:?} card_id={:?}", 
+          subject_id, card_id
+        );
+    }
+
 }

@@ -7,7 +7,7 @@ if [[ $# -eq 0 ]] ; then
 fi
 
 export PARENT=$1
-export CONTRACT=contract_v2.$PARENT
+export CONTRACT=contract_v3.$PARENT
 export REQUESTOR_ID=maz.testnet
 
 #./deploy.sh $PARENT $CONTRACT

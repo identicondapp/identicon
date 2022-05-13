@@ -79,4 +79,51 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; fini
 **Falta:** Todavía no se procesa el `callback` del llamado y no se hace tratamiento de errores.
 
 
+### Agregar un IPFS 
 
+Abrimos una cuenta en Pinata: https://app.pinata.cloud/pinmanager
+
+Subimos un archivo, cuyo CID es:
+~~~
+Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW
+~~~
+
+Se puede acceder mediante el [gateway IPFS de Pinata](https://gateway.pinata.cloud/ipfs) usando su CID:
+~~~
+https://gateway.pinata.cloud/ipfs/Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW
+~~~
+
+Agregamos el metodo `bind_card_file` al contrato para vinculara el archivo al sujeto verificado,
+agregamos un test unitario para el metodo y corremos el test:
+~~~
+$ ./test.sh bind_card_file
+
+warning: `identicon` (lib test) generated 4 warnings
+    Finished test [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests (target/debug/deps/identicon-8b52b262c817c864)
+
+running 1 test
+
+init:: initialized contract state: [verifications], [assignments], [validators]
+
+bind_card_file: Called method bind_card_file("ar_dni_12488401" "Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW")
+
+test_bind_card_file: subject_id="ar_dni_12488401" card_id="Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW"
+test tests::tests::test_bind_card_file ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+~~~
+
+Ahora llamamos al metodo de nuestro contrato usando near cli:
+~~~
+$ ./run-bindcard.sh identicon.testnet 488
+Scheduling a call: contract_v3.identicon.testnet.bind_card_file({"subject_id":"ar_dni_12488488", "card_id":"Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW"})
+Doing account.functionCall()
+Receipt: CiUp7ZpQwENHt9nTa5QbzRY8bq2YuRZvYHYMiwrRMac5
+        Log [contract_v3.identicon.testnet]: 
+bind_card_file: Called method bind_card_file("ar_dni_12488488" "Qmc3kQzgwWof7mLG7PPPb1vx6DYDqv9YrW1nWBGhHRqiWW")
+Transaction Id 2dyACfBzaDh5EfDefsHe3C7P7syjD5Uqic4z9Wzh5iy1
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/2dyACfBzaDh5EfDefsHe3C7P7syjD5Uqic4z9Wzh5iy1
+''
+~~~

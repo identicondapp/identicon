@@ -2,11 +2,12 @@ use near_sdk::collections::UnorderedMap;
 use near_sdk::log;
 use near_sdk::{env, near_bindgen};
 
+mod cards;
 mod definitions;
 mod payments;
 mod requests;
-mod validators;
 mod upgrades;
+mod validators;
 use definitions::*;
 
 #[cfg(test)]

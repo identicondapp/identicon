@@ -1,5 +1,5 @@
-use near_sdk::{env, log};
 use near_sdk::near_bindgen;
+use near_sdk::{env, log};
 use serde_json::json;
 
 use crate::definitions::*;
@@ -15,18 +15,18 @@ impl VerificationContract {
         subject_id: SubjectId,
         subject_info: SubjectInfo,
     ) {
-      // log #0 as JSON for TheGraph
-      env::log_str(
-        &json!({
-            "type": VerificationType::ProofOfLife,
-            "requestor_id": requestor_id.to_string(),
-            "subject_id": subject_id.to_string(),
-            "state": VerificationState::Pending
-        })
-        .to_string(),
-      );
+        // log #0 as JSON for TheGraph
+        env::log_str(
+            &json!({
+                "type": VerificationType::ProofOfLife,
+                "requestor_id": requestor_id.to_string(),
+                "subject_id": subject_id.to_string(),
+                "state": VerificationState::Pending
+            })
+            .to_string(),
+        );
 
-      log!(
+        log!(
             "\nrequest_verification: Called method request_verification({:?} {:?} {:?})",
             requestor_id,
             is_type,
