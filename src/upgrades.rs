@@ -1,6 +1,4 @@
-use near_sdk::{env, near_bindgen};
-use near_sdk::{Gas};
-use near_sdk::log;
+use near_sdk::{log, env, Gas, near_bindgen};
 use crate::definitions::*;
 
 /// Gas for upgrading this contract on promise creation + deploying new contract.

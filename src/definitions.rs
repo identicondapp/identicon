@@ -21,7 +21,7 @@ pub type ISODateTime = String;
 pub type FileId = String;
 
 // The location coordinates as obtained from GoogleMaps/other
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct GPSCoordinates {
     pub long: String,
@@ -29,7 +29,7 @@ pub struct GPSCoordinates {
 }
 
 // A naive implementation for the Subject Contact info
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct ContactInfo {
     pub phones: String,
@@ -37,7 +37,7 @@ pub struct ContactInfo {
 }
 
 // A naive implementation for the subject Address location
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct LocationInfo {
     pub directions: String, // ex: 'Calle Las Lomitas Nro. 23 e/ Pampa y La Via'
@@ -48,7 +48,7 @@ pub struct LocationInfo {
 }
 
 // The Time Window in which the verification must be performed
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct TimeWindow {
     pub starts: ISODateTime,
@@ -56,7 +56,7 @@ pub struct TimeWindow {
 }
 
 // All the relevant Subject information
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct SubjectInfo {
     pub age: u8,

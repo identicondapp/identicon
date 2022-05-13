@@ -80,6 +80,9 @@ impl VerificationContract {
             "request_verification: Added to verifications list {:?}",
             &request
         );
+
+        // return the verification state
+        request.state;
     }
 
     /* Private */

@@ -59,7 +59,6 @@ Next steps:
   3. Run `yarn deploy` to deploy the subgraph.
 
 Make sure to visit the documentation on https://thegraph.com/docs/ for further information.
-
 ~~~
 
 ~~~
@@ -315,4 +314,3 @@ Types generated successfully
 
 Done in 1.60s.
 ~~~
-
